@@ -1,0 +1,170 @@
+{% extends "tours_main/base.html" %}
+{% load static %}
+
+{% block title %}
+Туры
+{% endblock %}
+
+{% block content %}
+
+<section class="tours-hero">
+
+    <div class="tours-hero-content">
+
+        <span class="tours-subtitle">
+            ✈ Подбор путешествий
+        </span>
+
+        <h1>
+            Найдите тур
+            <span>своей мечты</span>
+        </h1>
+
+        <p>
+            Более 500 направлений по всему миру.
+            Удобные фильтры, лучшие цены и проверенные отели.
+        </p>
+
+    </div>
+
+</section>
+<section class="tours-page">
+
+    <div class="tours-container">
+
+        <!-- ЛЕВАЯ КОЛОНКА -->
+        <aside class="filter">
+
+            <h2>Подбор тура</h2>
+
+            <div class="filter-group">
+                <label>🌍 Страна</label>
+                <select>
+                    <option>Любая</option>
+                    <option>Турция</option>
+                    <option>Италия</option>
+                    <option>Мальдивы</option>
+                    <option>ОАЭ</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>💰 Бюджет</label>
+                <input type="range" min="30000" max="300000">
+                <span class="filter-price">от 50 000 ₽</span>
+            </div>
+
+            <div class="filter-group">
+                <label>🌙 Ночей</label>
+                <select>
+                    <option>Любое</option>
+                    <option>3–5</option>
+                    <option>7–10</option>
+                    <option>10–14</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>🍽 Питание</label>
+                <select>
+                    <option>Любое</option>
+                    <option>Всё включено</option>
+                    <option>Завтраки</option>
+                    <option>Без питания</option>
+                </select>
+            </div>
+
+            <button class="find-tour-btn">Найти тур</button>
+
+        </aside>
+
+        <!-- ПРАВАЯ КОЛОНКА -->
+        <div class="tours-results">
+
+            {% for tour in tours %}
+
+            <div class="tour-card">
+
+                <div class="tour-card-image">
+
+                    <img src="{{ tour.image.url }}" alt="{{ tour.title }}">
+
+                    <div class="tour-rating">
+                        ⭐ {{ tour.rating }}
+                    </div>
+
+                    {% if tour.is_hot %}
+                    <div class="tour-hot">
+                        🔥 Горящий тур
+                    </div>
+                    {% endif %}
+
+                </div>
+
+                <div class="tour-card-content">
+
+                    <div class="tour-country">
+                        🌍 {{ tour.destination.name }} • {{ tour.city }}
+                    </div>
+
+                    <h2>{{ tour.title }}</h2>
+
+                    <div class="tour-hotel">
+                        ★★★★★ {{ tour.hotel }}
+                    </div>
+
+                    <p>{{ tour.description }}</p>
+
+                    <div class="tour-icons">
+                        <span>✈ {{ tour.departure }}</span>
+                        <span>🌙 {{ tour.nights }} ночей</span>
+                        <span>🍽 {{ tour.food }}</span>
+                    </div>
+
+                    <div class="tour-footer">
+
+                        <div class="tour-price">
+                            <span>от</span>
+                            <strong>{{ tour.price }} ₽</strong>
+                        </div>
+
+                        <a href="#" class="tour-more">
+
+                            <span>Подробнее</span>
+
+                            <svg class="tour-arrow"
+                                 width="20"
+                                 height="20"
+                                 viewBox="0 0 24 24"
+                                 fill="none">
+
+                                <path d="M5 12H19"
+                                      stroke="currentColor"
+                                      stroke-width="2.4"
+                                      stroke-linecap="round"/>
+
+                                <path d="M13 6L19 12L13 18"
+                                      stroke="currentColor"
+                                      stroke-width="2.4"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"/>
+
+                            </svg>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
