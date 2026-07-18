@@ -231,9 +231,9 @@
 
     0deg,
 
-    rgba(0,0,0,.55),
+    rgba(0, 0, 0, 0.712),
 
-    transparent 60%
+    transparent 20%
 
     );
 
@@ -269,13 +269,20 @@
 
 .destination-overlay h3{
 
-    color:white;
+    color:#ffffff;
 
-    font-size:26px;
+    font-size:32px;
 
-    font-weight:800;
+    font-weight:900;
 
-    margin:0 0 8px;
+    line-height:1.05;
+
+    margin:0 0 10px;
+
+    letter-spacing:-0.02em;
+
+    text-shadow:
+        0 4px 18px rgba(0,0,0,.65);
 
 }
 
@@ -283,11 +290,16 @@
 
 .destination-description{
 
-    color:white;
+    color:rgba(255,255,255,.98);
 
-    opacity:.85;
+    font-size:17px;
 
-    font-size:14px;
+    font-weight:500;
+
+    line-height:1.45;
+
+    text-shadow:
+        0 2px 10px rgba(0,0,0,.45);
 
 }
 
@@ -378,7 +390,7 @@
 
     font-weight:600;
 
-    color:#16345B;
+    color:#d3e6ff;
 
     opacity:.9;
 
@@ -392,6 +404,8 @@
     font-size:20px;
 
     font-weight:800;
+
+    color:#fcfcfc;
 
 }
 
