@@ -16,14 +16,6 @@ def index(request):
         }
     )
 
-
-def about(request):
-
-    return render(
-        request,
-        "tours_main/about.html"
-    )
-
 def tours(request):
 
     tours = Tour.objects.select_related("destination").all()
@@ -35,3 +27,6 @@ def tours(request):
             "tours": tours
         }
     )
+
+def about(request):
+    return render(request, "tours_main/about.html")

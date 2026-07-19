@@ -1,0 +1,638 @@
+/* ==========================================================
+                        ABOUT HERO
+========================================================== */
+
+.about-hero{
+    position: relative;
+    width: 100%;
+    height: 785px;
+    overflow: hidden;
+
+    background-image:
+        linear-gradient(
+            90deg,
+            #ffffff 0%,
+            rgba(255,255,255,.98) 23%,
+            rgba(255,255,255,.90) 36%,
+            rgba(255,255,255,.55) 48%,
+            rgba(255,255,255,.12) 58%,
+            rgba(255,255,255,0) 66%
+        ),
+        url("../img/about-bg.png");
+
+    background-repeat:no-repeat;
+    background-position:right center;
+    background-size:cover;
+}
+
+/* ==========================================================
+                        CONTAINER
+========================================================== */
+
+.about-container{
+
+    width:1500px;
+    height:100%;
+
+    margin:0 auto;
+
+    display:flex;
+    align-items:flex-start;
+
+    position:relative;
+
+}
+
+/* ==========================================================
+                        CONTENT
+========================================================== */
+
+.about-content{
+
+    width:720px;
+
+    padding-top:62px;
+
+    position:relative;
+    z-index:3;
+
+}
+
+/* ==========================================================
+                        LABEL
+========================================================== */
+
+.about-label{
+
+    display:inline-block;
+
+    margin-bottom:18px;
+
+    font-size:18px;
+
+    font-weight:700;
+
+    color:#2F79FF;
+
+}
+
+/* ==========================================================
+                        TITLE
+========================================================== */
+
+.about-content h1{
+
+    margin:0;
+
+    width:900px;
+
+    font-size:66px;
+
+    font-weight:800;
+
+    line-height:1.04;
+
+    letter-spacing:-2px;
+
+    color:#173764;
+
+}
+
+.about-content h1 span{
+
+    color:#2F79FF;
+
+}
+
+/* ==========================================================
+                        DESCRIPTION
+========================================================== */
+
+.about-content p{
+
+    width:690px;
+
+    margin-top:28px;
+
+    margin-bottom:42px;
+
+    font-size:21px;
+
+    line-height:1.62;
+
+    font-weight:400;
+
+    color:#66758F;
+
+}
+
+/* ==========================================================
+                        STATS
+========================================================== */
+
+.about-stats{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:44px;
+
+    margin-top:18px;
+
+}
+
+/* ==========================================================
+                        ITEM
+========================================================== */
+
+.stat-item{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+}
+
+/* ==========================================================
+                        WIDTHS
+========================================================== */
+
+.stat-item:nth-child(1){
+
+    width:120px;
+
+}
+
+.stat-item:nth-child(2){
+
+    width:195px;
+
+}
+
+.stat-item:nth-child(3){
+
+    width:135px;
+
+}
+
+.stat-item:nth-child(4){
+
+    width:135px;
+
+}
+
+/* ==========================================================
+                        ICON
+========================================================== */
+
+.stat-icon{
+
+    width:66px;
+
+    height:66px;
+
+    border-radius:50%;
+
+    background:#F4F8FF;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin-bottom:18px;
+
+}
+
+.stat-icon svg{
+
+    width:34px;
+
+    height:34px;
+
+    fill:none;
+
+    stroke:#2F79FF;
+
+    stroke-width:1.8;
+
+    stroke-linecap:round;
+
+    stroke-linejoin:round;
+
+}
+
+/* ==========================================================
+                        NUMBER
+========================================================== */
+
+.stat-item h3{
+
+    margin:0;
+
+    font-size:33px;
+
+    font-weight:800;
+
+    line-height:1;
+
+    letter-spacing:-1px;
+
+    color:#2F79FF;
+
+}
+
+/* ==========================================================
+                        TEXT
+========================================================== */
+
+.stat-item span{
+
+    margin-top:10px;
+
+    font-size:16px;
+
+    line-height:1.35;
+
+    font-weight:500;
+
+    color:#66758F;
+
+}
+
+/* ==========================================================
+                        HOVER
+========================================================== */
+
+.stat-item{
+
+    transition:.25s;
+
+}
+
+.stat-item:hover{
+
+    transform:translateY(-4px);
+
+}
+
+.stat-item:hover .stat-icon{
+
+    box-shadow:0 14px 28px rgba(47,121,255,.18);
+
+}
+
+/* ==========================================================
+                        WHY US
+========================================================== */
+
+.why-us{
+
+    width:100%;
+
+    margin-top:-155px;
+
+    margin-bottom:90px;
+
+    position:relative;
+
+    z-index:20;
+
+}
+
+/* ==========================================================
+                        WRAPPER
+========================================================== */
+
+.why-wrapper{
+
+    width:1500px;
+
+    margin:0 auto;
+
+    background:#FFFFFF;
+
+    border-radius:34px;
+
+    padding:46px 56px 44px;
+
+    box-shadow:
+        0 18px 60px rgba(24,65,138,.08);
+
+}
+
+/* ==========================================================
+                        TITLE
+========================================================== */
+
+.why-wrapper h2{
+
+    margin:0 0 44px;
+
+    font-size:46px;
+
+    font-weight:800;
+
+    line-height:1.12;
+
+    letter-spacing:-1.3px;
+
+    color:#173764;
+
+}
+
+/* ==========================================================
+                        ITEMS
+========================================================== */
+
+.why-items{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+    gap:42px;
+
+}
+
+/* ==========================================================
+                        ITEM
+========================================================== */
+
+.why-item{
+
+    flex:1;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+}
+
+/* ==========================================
+                WHY ICON
+========================================== */
+
+.why-icon{
+
+    width:70px;
+
+    height:70px;
+
+    border-radius:50%;
+
+    background:#F4F8FF;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin-bottom:20px;
+
+    flex-shrink:0;
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease;
+
+}
+
+
+
+/* ==========================================
+                SVG
+========================================== */
+
+.why-icon svg{
+
+    width:52px;
+
+    height:52px;
+
+    display:block;
+
+    fill:none;
+
+    stroke:#2F79FF;
+
+    stroke-width:1.8;
+
+    stroke-linecap:round;
+
+    stroke-linejoin:round;
+
+    transform:scale(1.08);
+
+    transition:.25s;
+
+}
+
+
+
+/* Все линии одинаковой толщины */
+
+.why-icon svg path,
+.why-icon svg circle,
+.why-icon svg rect,
+.why-icon svg line,
+.why-icon svg polyline{
+
+    fill:none;
+
+    stroke:#2F79FF;
+
+    stroke-width:1.8;
+
+    stroke-linecap:round;
+
+    stroke-linejoin:round;
+
+    vector-effect:non-scaling-stroke;
+
+}
+
+
+
+/* Если где-нибудь используется заполненный кружок */
+
+.why-icon svg .fill{
+
+    fill:#2F79FF;
+
+    stroke:none;
+
+}
+
+/* ==========================================================
+                        ITEM TITLE
+========================================================== */
+
+.why-item h3{
+
+    margin:0 0 16px;
+
+    font-size:28px;
+
+    font-weight:700;
+
+    line-height:1.25;
+
+    color:#173764;
+
+}
+
+/* ==========================================================
+                        TEXT
+========================================================== */
+
+.why-item p{
+
+    margin:0;
+
+    width:295px;
+
+    font-size:18px;
+
+    line-height:1.72;
+
+    font-weight:400;
+
+    color:#66758F;
+
+}
+
+/* ==========================================================
+                    HOVER
+========================================================== */
+
+
+.why-icon{
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease;
+
+}
+
+
+.why-item:hover .why-icon{
+
+    transform:translateY(-5px);
+
+    box-shadow:
+
+        0 18px 35px rgba(47,121,255,.18);
+
+}
+
+/* ==========================================================
+                        RESPONSIVE
+========================================================== */
+
+@media (max-width:1550px){
+
+    .why-wrapper{
+
+        width:92%;
+
+    }
+
+}
+
+@media (max-width:1200px){
+
+    .why-items{
+
+        flex-wrap:wrap;
+
+        gap:34px;
+
+    }
+
+    .why-item{
+
+        flex:none;
+
+        width:calc(50% - 17px);
+
+    }
+
+    .why-item p{
+
+        width:100%;
+
+    }
+
+}
+
+@media (max-width:768px){
+
+    .why-us{
+
+        margin-top:40px;
+
+    }
+
+    .why-wrapper{
+
+        padding:30px;
+
+    }
+
+    .why-wrapper h2{
+
+        font-size:34px;
+
+        margin-bottom:30px;
+
+    }
+
+    .why-items{
+
+        flex-direction:column;
+
+        gap:30px;
+
+    }
+
+    .why-item{
+
+        width:100%;
+
+    }
+
+}
+
+.partners-section{
+    width:1650px;
+    margin:25px auto 60px;
+}
+
+/* Заголовок */
+.partners-subtitle{
+    font-size:45px;          /* как "Почему путешественники выбирают нас" */
+    font-weight:800;
+    line-height:1.1;
+    color:#173764;           /* тот же темно-синий */
+    margin:0 0 32px 0;
+    letter-spacing:-1px;
+    margin-left:130px;
+}
+
+/* Баннер с партнёрами */
+.partners-full{
+    width:108%;              /* немного увеличиваем */
+    max-width:none;
+    display:block;
+    margin-left:-4%;         /* центрируем после увеличения */
+}
