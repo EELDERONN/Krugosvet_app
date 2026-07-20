@@ -18,7 +18,27 @@ def index(request):
 
 def tours(request):
 
-    tours = Tour.objects.select_related("destination").all()
+    tours = (
+        Tour.objects
+        .select_related("destination")
+        .prefetch_related("images")
+    )
+
+    for tour in tours:
+
+        gallery = []
+
+        # Главное фото
+        if tour.image:
+            gallery.append(tour.image.url)
+
+        # Дополнительные фото
+        gallery.extend(
+            img.image.url
+            for img in tour.images.all().order_by("order")
+        )
+
+        tour.gallery = "|".join(gallery)
 
     return render(
         request,

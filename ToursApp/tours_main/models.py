@@ -120,3 +120,41 @@ class Tour(models.Model):
 
     def __str__(self):
         return self.title
+    
+    
+class TourImage(models.Model):
+
+    tour = models.ForeignKey(
+        Tour,
+        on_delete=models.CASCADE,
+        related_name="images",
+        verbose_name="Тур"
+    )
+
+    image = models.ImageField(
+        upload_to="tour_gallery/",
+        verbose_name="Фото"
+    )
+
+    title = models.CharField(
+        max_length=120,
+        blank=True,
+        verbose_name="Название"
+    )
+
+    order = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Порядок"
+    )
+
+    class Meta:
+
+        ordering = ["order"]
+
+        verbose_name = "Фотография тура"
+
+        verbose_name_plural = "Фотографии тура"
+
+    def __str__(self):
+
+        return f"{self.tour.title} ({self.order})"

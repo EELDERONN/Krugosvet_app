@@ -897,3 +897,379 @@
     transform:translateY(-4px);
     box-shadow:0 30px 45px rgba(47,116,255,.35);
 }
+
+/* ===========================================================
+                    TOUR POPUP — ФИНАЛЬНАЯ ВЕРСИЯ
+=========================================================== */
+
+.tour-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 9999;
+}
+
+.tour-popup.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Overlay */
+.tour-popup-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 25, 45, 0.65);
+    backdrop-filter: blur(22px);
+    z-index: 1;
+}
+
+/* Glass Container */
+.tour-popup-glass {
+    position: relative;
+    width: min(1740px, 97.5vw);
+    height: min(930px, 94vh);
+    padding: 26px;
+    border-radius: 46px;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1.5px solid rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(34px);
+    box-shadow: 0 50px 130px rgba(0, 0, 0, 0.32);
+    overflow: hidden;
+    z-index: 2;
+}
+
+/* Bubbles */
+.bubble {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.105);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(12px);
+    z-index: 1;
+    pointer-events: none;
+    animation: bubbleFloat 11s linear infinite;
+}
+
+@keyframes bubbleFloat {
+    0%   { transform: translateY(0) scale(1); opacity: 0.7; }
+    50%  { transform: translateY(-52px) scale(1.08); opacity: 0.9; }
+    100% { transform: translateY(0) scale(1); opacity: 0.7; }
+}
+
+.b1 { width: 205px; height: 205px; top: -95px; left: 85px; animation-delay: 0s; }
+.b2 { width: 130px; height: 130px; right: 155px; top: 75px; animation-delay: -2.8s; }
+.b3 { width: 235px; height: 235px; right: -115px; bottom: 125px; animation-delay: -7.2s; }
+.b4 { width: 98px; height: 98px; left: 235px; bottom: 105px; animation-delay: -10.5s; }
+.b5 { width: 150px; height: 150px; left: 45px; top: 395px; animation-delay: -5.1s; }
+.b6 { width: 82px; height: 82px; right: 395px; bottom: 85px; animation-delay: -1.2s; }
+.b7 { width: 180px; height: 180px; left: 695px; top: -105px; animation-delay: -9.4s; }
+
+/* White Card */
+.tour-popup-card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    background: #ffffff;
+    border-radius: 38px;
+    overflow: hidden;
+    box-shadow: 0 28px 75px rgba(0, 0, 0, 0.16);
+    z-index: 3;
+}
+
+/* Close Button */
+.popup-close {
+    position: absolute;
+    top: 34px;
+    right: 34px;
+    width: 62px;
+    height: 62px;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 31px;
+    color: #49658c;
+    cursor: pointer;
+    z-index: 20;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+    transition: all 0.35s ease;
+}
+
+.popup-close:hover {
+    transform: rotate(90deg);
+    background: #3478ff;
+    color: white;
+}
+
+/* Image Area */
+.popup-image-wrapper {
+    width: 55.5%;
+    height: 100%;
+    position: relative;
+    background: #f9fafd;
+    overflow: hidden;
+}
+
+.popup-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    background: #f9fafd;
+    transition: opacity 0.75s ease;
+}
+
+/* Navigation */
+.popup-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 66px;
+    height: 66px;
+    background: rgba(255,255,255,0.96);
+    border: none;
+    border-radius: 50%;
+    color: #1f4678;
+    font-size: 27px;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+
+.popup-nav:hover {
+    background: #3478ff;
+    color: white;
+    transform: translateY(-50%) scale(1.12);
+}
+
+.popup-prev { left: 32px; }
+.popup-next { right: 32px; }
+
+/* Gallery */
+.popup-gallery {
+    position: absolute;
+    bottom: 30px;
+    left: 34px;
+    display: flex;
+    gap: 15px;
+    z-index: 12;
+}
+
+.popup-thumb {
+    width: 102px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 18px;
+    cursor: pointer;
+    border: 3.5px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.popup-thumb:hover,
+.popup-thumb.active {
+    border-color: #3478ff;
+    transform: scale(1.08) translateY(-4px);
+}
+
+/* Content */
+.popup-content {
+    width: 44.5%;
+    padding: 60px 74px 58px 70px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    z-index: 5;
+}
+
+.popup-country {
+    color: #7a91b4;
+    font-size: 17.8px;
+    font-weight: 600;
+    letter-spacing: 1.3px;
+    margin-bottom: 11px;
+}
+
+.popup-content h2 {
+    font-size: 53px;
+    line-height: 1.04;
+    color: #162f5f;
+    margin: 0 0 15px 0;
+    font-weight: 700;
+}
+
+.popup-hotel {
+    color: #2a6fff;
+    font-size: 25.5px;
+    font-weight: 700;
+    margin-bottom: 27px;
+}
+
+.popup-description {
+    color: #5a779c;
+    font-size: 18.4px;
+    line-height: 1.79;
+    margin-bottom: 36px;
+    flex-grow: 1;
+}
+
+/* ===================== ИСПРАВЛЕННЫЕ ФИЧИ ===================== */
+.popup-features {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 16px;
+    margin-bottom: 38px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.popup-features::-webkit-scrollbar {
+    display: none;
+}
+
+.popup-features div {
+    background: #edf4ff;
+    padding: 17px 32px;
+    border-radius: 26px;
+    color: #385a8a;
+    font-size: 17.2px;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    min-width: fit-content;
+    text-align: center;
+}
+
+.popup-features div:hover {
+    transform: scale(1.07);
+    background: #e4f0ff;
+    box-shadow: 0 8px 20px rgba(42, 110, 255, 0.15);
+}
+
+/* Bottom */
+.popup-bottom {
+    margin-top: auto;
+    padding-top: 38px;
+    border-top: 1px solid #e4effd;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 32px;
+}
+
+.popup-price {
+    display: flex;
+    flex-direction: column;
+}
+
+.popup-price span {
+    font-size: 14.8px;
+    color: #8a9fc4;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+    margin-bottom: 7px;
+}
+
+.popup-price strong {
+    font-size: 57px;
+    line-height: 1;
+    color: #2a6fff;
+    font-weight: 800;
+}
+
+/* Special Book Button */
+.popup-book {
+    background: linear-gradient(135deg, #2a6fff, #1a4ee6);
+    color: white;
+    border: none;
+    padding: 23px 56px;
+    border-radius: 28px;
+    font-size: 21px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 18px 45px rgba(42, 110, 255, 0.45);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.popup-book::before {
+    content: '';
+    position: absolute;
+    top: -60%;
+    left: -80%;
+    width: 50%;
+    height: 280%;
+    background: linear-gradient(
+        135deg,
+        transparent 30%,
+        rgba(255,255,255,0.55) 50%,
+        transparent 70%
+    );
+    transition: left 0.7s;
+}
+
+.popup-book:hover {
+    transform: translateY(-8px) scale(1.07);
+    box-shadow: 0 32px 70px rgba(26, 78, 230, 0.6);
+}
+
+.popup-book:hover::before {
+    left: 140%;
+}
+
+.popup-book:active {
+    transform: scale(0.96);
+}
+
+/* Scrollbar */
+.popup-content::-webkit-scrollbar {
+    width: 9px;
+}
+.popup-content::-webkit-scrollbar-track {
+    background: #edf3ff;
+    border-radius: 20px;
+}
+.popup-content::-webkit-scrollbar-thumb {
+    background: #3478ff;
+    border-radius: 20px;
+}
+.popup-content::-webkit-scrollbar-thumb:hover {
+    background: #1e5cff;
+}
+
+/* Responsive */
+@media (max-width: 1650px) {
+    .tour-popup-glass { padding: 22px; }
+}
+
+@media (max-width: 1300px) {
+    .tour-popup-card { flex-direction: column; }
+    .popup-image-wrapper { width: 100%; height: 47%; }
+    .popup-content { width: 100%; padding: 50px 58px; }
+}
+
+@media (max-width: 768px) {
+    .tour-popup-glass {
+        width: 100vw;
+        height: 100vh;
+        padding: 0;
+        border-radius: 0;
+    }
+}

@@ -128,7 +128,20 @@
                             <strong>{{ tour.price }} ₽</strong>
                         </div>
 
-                        <a href="#" class="tour-more">
+                        <a href="#"
+                            class="tour-more open-popup"
+
+                            data-image="{{ tour.image.url }}"
+                            data-gallery="{% for img in tour.images.all %}{{ img.image.url }}{% if not forloop.last %}|{% endif %}{% endfor %}"
+
+                            data-country="{{ tour.destination.name }} • {{ tour.city }}"
+                            data-title="{{ tour.title }}"
+                            data-hotel="{{ tour.hotel }}"
+                            data-description="{{ tour.description }}"
+                            data-departure="✈ {{ tour.departure }}"
+                            data-nights="🌙 {{ tour.nights }} ночей"
+                            data-food="🍽 {{ tour.food }}"
+                            data-price="{{ tour.price }} ₽">
 
                             <span>Подробнее</span>
 
@@ -166,5 +179,144 @@
     </div>
 
 </section>
+
+<!-- ===========================================
+            TOUR POPUP
+=========================================== -->
+
+<div class="tour-popup" id="tourPopup">
+
+    <div class="tour-popup-overlay"></div>
+
+    <div class="tour-popup-glass">
+
+        <!-- пузырьки -->
+
+        <span class="bubble b1"></span>
+        <span class="bubble b2"></span>
+        <span class="bubble b3"></span>
+        <span class="bubble b4"></span>
+        <span class="bubble b5"></span>
+        <span class="bubble b6"></span>
+        <span class="bubble b7"></span>
+
+        <!-- белая карточка -->
+
+        <div class="tour-popup-card">
+
+            <button class="popup-close">
+
+                ✕
+
+            </button>
+
+            <div class="popup-image-wrapper">
+
+    <button
+        class="popup-nav popup-prev"
+        id="popupPrev">
+
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+
+            <path
+                d="M15 5L8 12L15 19"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"/>
+
+        </svg>
+
+    </button>
+
+    <img
+        id="popupImage"
+        class="popup-image"
+        src=""
+        alt="">
+
+    <button
+        class="popup-nav popup-next"
+        id="popupNext">
+
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+
+            <path
+                d="M9 5L16 12L9 19"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"/>
+
+        </svg>
+
+    </button>
+
+</div>
+
+<div class="popup-gallery" id="popupGallery">
+
+</div>
+
+            <div class="popup-content">
+
+                <div class="popup-country"
+                     id="popupCountry">
+
+                </div>
+
+                <h2 id="popupTitle">
+
+                </h2>
+
+                <div class="popup-hotel"
+                     id="popupHotel">
+
+                </div>
+
+                <div class="popup-description"
+                     id="popupDescription">
+
+                </div>
+
+                <div class="popup-features">
+
+                    <div id="popupDeparture"></div>
+
+                    <div id="popupNights"></div>
+
+                    <div id="popupFood"></div>
+
+                </div>
+
+                <div class="popup-bottom">
+
+                    <div class="popup-price">
+
+                        <span>Стоимость</span>
+
+                        <strong id="popupPrice">
+
+                        </strong>
+
+                    </div>
+
+                    <button class="popup-book">
+
+                        Забронировать
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="{% static 'tours_main/js/popup.js' %}"></script>
 
 {% endblock %}

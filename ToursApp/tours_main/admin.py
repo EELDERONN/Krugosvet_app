@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Destination
-from .models import Tour
+
+from .models import Destination, Tour, TourImage
+
 
 @admin.register(Destination)
 class DestinationAdmin(admin.ModelAdmin):
@@ -13,6 +14,20 @@ class DestinationAdmin(admin.ModelAdmin):
     prepopulated_fields = {
         "slug": ("name",)
     }
+
+
+class TourImageInline(admin.TabularInline):
+
+    model = TourImage
+
+    extra = 1
+
+    fields = (
+        "image",
+        "title",
+        "order",
+    )
+
 
 @admin.register(Tour)
 class TourAdmin(admin.ModelAdmin):
@@ -35,4 +50,18 @@ class TourAdmin(admin.ModelAdmin):
         "title",
         "hotel",
         "city",
+    )
+
+    inlines = [
+        TourImageInline
+    ]
+
+
+@admin.register(TourImage)
+class TourImageAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "tour",
+        "title",
+        "order",
     )
