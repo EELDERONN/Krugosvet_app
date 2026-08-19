@@ -1,0 +1,929 @@
+/* ==========================================================
+   КРУГОСВЕТ — Вход / Регистрация
+   Токены взяты из header.css / hero.css / promo.css,
+   чтобы страница жила в одной системе с остальным сайтом.
+   ========================================================== */
+
+:root{
+    --kr-blue-700:#0F55D6;
+    --kr-blue-600:#156BFF;
+    --kr-blue-500:#1974FF;
+    --kr-blue-400:#2F86FF;
+    --kr-blue-300:#48A0FF;
+    --kr-blue-100:#E8F2FF;
+    --kr-blue-50:#F5FAFF;
+
+    --kr-ink:#16345B;
+    --kr-ink-2:#1B335A;
+    --kr-ink-3:#36425A;
+
+    --kr-muted:#68748E;
+    --kr-muted-2:#99A7BC;
+
+    --kr-line:#E7EDF5;
+    --kr-bg:#F7FBFF;
+
+    --kr-danger:#E2445C;
+    --kr-ok:#12A06A;
+
+    --kr-r-lg:38px;
+    --kr-r-md:26px;
+    --kr-r-sm:18px;
+    --kr-r-pill:999px;
+}
+
+/* ==========================================================
+                        СЦЕНА
+   ========================================================== */
+
+.auth-scene{
+    position:relative;
+    min-height:100vh;
+
+    padding:150px 24px 80px;   /* 95px шапка + воздух */
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    overflow:hidden;
+}
+
+/* ---------- Живой фон: мягкие световые пятна ---------- */
+
+.auth-sky{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+}
+
+.auth-sky__blob{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(90px);
+    opacity:.55;
+}
+
+.auth-sky__blob--1{
+    width:620px;
+    height:620px;
+    top:-180px;
+    left:-140px;
+    background:radial-gradient(circle at 35% 35%, #9FCBFF, rgba(159,203,255,0) 70%);
+    animation:kr-drift-1 26s ease-in-out infinite;
+}
+
+.auth-sky__blob--2{
+    width:520px;
+    height:520px;
+    bottom:-160px;
+    right:-100px;
+    background:radial-gradient(circle at 60% 40%, #BFDCFF, rgba(191,220,255,0) 70%);
+    animation:kr-drift-2 32s ease-in-out infinite;
+}
+
+.auth-sky__blob--3{
+    width:420px;
+    height:420px;
+    top:38%;
+    right:26%;
+    background:radial-gradient(circle at 50% 50%, #D8EAFF, rgba(216,234,255,0) 70%);
+    animation:kr-drift-3 38s ease-in-out infinite;
+}
+
+@keyframes kr-drift-1{
+    0%,100%{ transform:translate(0,0) scale(1); }
+    50%    { transform:translate(70px,60px) scale(1.12); }
+}
+
+@keyframes kr-drift-2{
+    0%,100%{ transform:translate(0,0) scale(1); }
+    50%    { transform:translate(-80px,-50px) scale(1.08); }
+}
+
+@keyframes kr-drift-3{
+    0%,100%{ transform:translate(0,0) scale(1); }
+    50%    { transform:translate(-50px,70px) scale(1.15); }
+}
+
+/* ==========================================================
+                    СТЕКЛЯННАЯ КАРТА
+   ========================================================== */
+
+.auth-shell{
+    position:relative;
+    z-index:2;
+
+    width:min(1180px, 100%);
+
+    display:grid;
+    grid-template-columns:1.02fr .98fr;
+
+    border-radius:var(--kr-r-lg);
+    overflow:hidden;
+
+    background:linear-gradient(
+        145deg,
+        rgba(255,255,255,.62) 0%,
+        rgba(255,255,255,.42) 45%,
+        rgba(255,255,255,.28) 100%
+    );
+
+    backdrop-filter:blur(42px) saturate(180%);
+    -webkit-backdrop-filter:blur(42px) saturate(180%);
+
+    border:1px solid rgba(255,255,255,.72);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.9),
+        inset 0 -1px 0 rgba(255,255,255,.16),
+        0 34px 90px rgba(30,80,180,.16);
+
+    animation:kr-shell-in .8s cubic-bezier(.22,1,.36,1) both;
+}
+
+@keyframes kr-shell-in{
+    from{ opacity:0; transform:translateY(34px) scale(.985); }
+    to  { opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* Медленный блик, проходящий по стеклу */
+.auth-shell::before{
+    content:"";
+    position:absolute;
+    top:-320px;
+    left:-40%;
+
+    width:280px;
+    height:900px;
+
+    background:linear-gradient(
+        180deg,
+        rgba(255,255,255,.9),
+        rgba(255,255,255,0)
+    );
+
+    transform:rotate(24deg);
+    filter:blur(30px);
+    opacity:.5;
+
+    pointer-events:none;
+
+    animation:kr-sheen 9s ease-in-out infinite;
+}
+
+@keyframes kr-sheen{
+    0%   { left:-40%;  opacity:0; }
+    18%  { opacity:.5; }
+    60%  { left:115%;  opacity:0; }
+    100% { left:115%;  opacity:0; }
+}
+
+/* ==========================================================
+              ЛЕВАЯ ПОЛОВИНА — МАРШРУТ
+   ========================================================== */
+
+.auth-aside{
+    position:relative;
+    padding:60px 56px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+
+    background:linear-gradient(
+        160deg,
+        rgba(233,243,255,.85) 0%,
+        rgba(214,233,255,.65) 55%,
+        rgba(198,224,255,.5) 100%
+    );
+
+    border-right:1px solid rgba(255,255,255,.6);
+}
+
+.auth-aside__eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+
+    align-self:flex-start;
+
+    height:40px;
+    padding:0 20px;
+
+    border-radius:var(--kr-r-pill);
+
+    font-size:14px;
+    font-weight:700;
+    color:var(--kr-blue-600);
+
+    background:rgba(255,255,255,.6);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,.8);
+
+    box-shadow:0 8px 22px rgba(25,116,255,.10);
+
+    animation:kr-rise .7s .1s cubic-bezier(.22,1,.36,1) both;
+}
+
+.auth-aside__eyebrow svg{
+    width:16px;
+    height:16px;
+}
+
+.auth-aside__title{
+    margin:34px 0 0;
+
+    font-size:52px;
+    line-height:1.06;
+    font-weight:800;
+    color:var(--kr-ink);
+
+    animation:kr-rise .7s .18s cubic-bezier(.22,1,.36,1) both;
+}
+
+.auth-aside__title span{
+    display:block;
+    color:var(--kr-blue-500);
+}
+
+.auth-aside__text{
+    margin:22px 0 0;
+    max-width:400px;
+
+    font-size:18px;
+    line-height:1.5;
+    color:var(--kr-muted);
+
+    animation:kr-rise .7s .26s cubic-bezier(.22,1,.36,1) both;
+}
+
+/* ---------- Подпись: маршрут с самолётом ---------- */
+
+.auth-route{
+    position:relative;
+    margin:44px 0 0;
+    width:100%;
+    height:180px;
+
+    animation:kr-rise .7s .34s cubic-bezier(.22,1,.36,1) both;
+}
+
+.auth-route svg{
+    width:100%;
+    height:100%;
+    overflow:visible;
+}
+
+.auth-route__line{
+    stroke:var(--kr-blue-400);
+    stroke-width:2.5;
+    stroke-linecap:round;
+    stroke-dasharray:7 11;
+    fill:none;
+    opacity:.55;
+
+    animation:kr-dash 2.4s linear infinite;
+}
+
+@keyframes kr-dash{
+    to{ stroke-dashoffset:-36; }
+}
+
+.auth-route__pin circle{
+    transform-box:fill-box;
+    transform-origin:center;
+}
+
+.auth-route__halo{
+    fill:var(--kr-blue-400);
+    opacity:.25;
+    animation:kr-pulse 2.6s ease-in-out infinite;
+}
+
+.auth-route__pin--b .auth-route__halo{ animation-delay:1.3s; }
+
+@keyframes kr-pulse{
+    0%,100%{ transform:scale(1);   opacity:.28; }
+    50%    { transform:scale(1.9); opacity:0;   }
+}
+
+.auth-route__dot{ fill:var(--kr-blue-600); }
+
+.auth-route__label{
+    font-family:"Inter", sans-serif;
+    font-size:13px;
+    font-weight:700;
+    fill:var(--kr-ink-2);
+}
+
+.auth-route__plane{ fill:var(--kr-blue-600); }
+
+/* ---------- Мини-статистика ---------- */
+
+.auth-facts{
+    display:flex;
+    gap:14px;
+    margin-top:34px;
+
+    animation:kr-rise .7s .42s cubic-bezier(.22,1,.36,1) both;
+}
+
+.auth-facts__item{
+    flex:1;
+    padding:16px 18px;
+
+    border-radius:var(--kr-r-sm);
+
+    background:rgba(255,255,255,.55);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,.75);
+
+    box-shadow:0 10px 26px rgba(30,80,180,.07);
+
+    transition:transform .3s ease, box-shadow .3s ease;
+}
+
+.auth-facts__item:hover{
+    transform:translateY(-3px);
+    box-shadow:0 18px 38px rgba(30,80,180,.13);
+}
+
+.auth-facts__num{
+    display:block;
+    font-size:24px;
+    font-weight:800;
+    color:var(--kr-blue-600);
+    line-height:1;
+}
+
+.auth-facts__cap{
+    display:block;
+    margin-top:6px;
+    font-size:13px;
+    color:var(--kr-muted);
+}
+
+/* ==========================================================
+                ПРАВАЯ ПОЛОВИНА — ФОРМЫ
+   ========================================================== */
+
+.auth-panel{
+    padding:60px 60px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+    background:rgba(255,255,255,.5);
+
+    animation:kr-rise .7s .2s cubic-bezier(.22,1,.36,1) both;
+}
+
+@keyframes kr-rise{
+    from{ opacity:0; transform:translateY(22px); }
+    to  { opacity:1; transform:translateY(0); }
+}
+
+/* ---------- Системные сообщения ---------- */
+
+.auth-flash{
+    list-style:none;
+    margin:0 0 22px;
+    padding:0;
+
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.auth-flash__item{
+    padding:14px 18px;
+    border-radius:var(--kr-r-sm);
+
+    font-size:14.5px;
+    font-weight:600;
+
+    background:rgba(232,242,255,.9);
+    color:var(--kr-blue-700);
+    border:1px solid rgba(21,107,255,.16);
+
+    animation:kr-rise .5s both;
+}
+
+.auth-flash__item--success{
+    background:rgba(224,247,238,.9);
+    color:var(--kr-ok);
+    border-color:rgba(18,160,106,.2);
+}
+
+.auth-flash__item--error{
+    background:rgba(253,235,238,.9);
+    color:var(--kr-danger);
+    border-color:rgba(226,68,92,.2);
+}
+
+/* ---------- Переключатель вкладок ---------- */
+
+.auth-switcher{
+    position:relative;
+
+    display:grid;
+    grid-template-columns:1fr 1fr;
+
+    padding:6px;
+    margin-bottom:34px;
+
+    border-radius:var(--kr-r-pill);
+
+    background:rgba(255,255,255,.55);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,.8);
+
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+.auth-switcher__btn{
+    position:relative;
+    z-index:2;
+
+    height:50px;
+    border:none;
+    background:transparent;
+
+    font-family:inherit;
+    font-size:16px;
+    font-weight:700;
+    color:var(--kr-ink-3);
+
+    border-radius:var(--kr-r-pill);
+    cursor:pointer;
+
+    transition:color .3s ease;
+}
+
+.auth-switcher__btn.is-active{ color:#fff; }
+
+.auth-switcher__thumb{
+    position:absolute;
+    z-index:1;
+    top:6px;
+    left:6px;
+
+    width:calc(50% - 6px);
+    height:calc(100% - 12px);
+
+    border-radius:var(--kr-r-pill);
+
+    background:linear-gradient(180deg, var(--kr-blue-300), var(--kr-blue-500));
+    box-shadow:0 10px 26px rgba(25,116,255,.32);
+
+    transition:transform .42s cubic-bezier(.22,1,.36,1);
+}
+
+.auth-switcher[data-active="register"] .auth-switcher__thumb{
+    transform:translateX(100%);
+}
+
+/* ---------- Форма ---------- */
+
+.auth-form{
+    display:none;
+    flex-direction:column;
+    gap:20px;
+}
+
+.auth-form.is-active{ display:flex; }
+
+/* Поля появляются каскадом */
+.auth-form.is-active .auth-field,
+.auth-form.is-active .auth-form__row,
+.auth-form.is-active .auth-agree,
+.auth-form.is-active .auth-submit,
+.auth-form.is-active .auth-foot{
+    animation:kr-field-in .5s cubic-bezier(.22,1,.36,1) both;
+}
+
+.auth-form.is-active > *:nth-child(1){ animation-delay:.02s; }
+.auth-form.is-active > *:nth-child(2){ animation-delay:.06s; }
+.auth-form.is-active > *:nth-child(3){ animation-delay:.10s; }
+.auth-form.is-active > *:nth-child(4){ animation-delay:.14s; }
+.auth-form.is-active > *:nth-child(5){ animation-delay:.18s; }
+.auth-form.is-active > *:nth-child(6){ animation-delay:.22s; }
+.auth-form.is-active > *:nth-child(7){ animation-delay:.26s; }
+.auth-form.is-active > *:nth-child(8){ animation-delay:.30s; }
+
+@keyframes kr-field-in{
+    from{ opacity:0; transform:translateY(14px); }
+    to  { opacity:1; transform:translateY(0); }
+}
+
+.auth-field{
+    display:flex;
+    flex-direction:column;
+    gap:9px;
+}
+
+.auth-field__label{
+    font-size:14px;
+    font-weight:700;
+    color:var(--kr-ink-2);
+    letter-spacing:.01em;
+}
+
+.auth-field__box{
+    position:relative;
+    display:flex;
+    align-items:center;
+}
+
+/* Класс на input задаётся в forms.py */
+.auth-field__input{
+    width:100%;
+    height:58px;
+
+    padding:0 20px;
+
+    font-family:inherit;
+    font-size:16px;
+    color:var(--kr-ink);
+
+    background:rgba(255,255,255,.75);
+    border:1.5px solid rgba(210,226,246,.9);
+    border-radius:var(--kr-r-md);
+
+    outline:none;
+
+    transition:
+        border-color .28s ease,
+        box-shadow .28s ease,
+        background .28s ease,
+        transform .28s ease;
+}
+
+.auth-field__input::placeholder{ color:var(--kr-muted-2); }
+
+.auth-field__input:hover{
+    border-color:rgba(72,160,255,.55);
+}
+
+.auth-field__input:focus{
+    background:#fff;
+    border-color:var(--kr-blue-400);
+    box-shadow:
+        0 0 0 5px rgba(47,134,255,.14),
+        0 12px 30px rgba(25,116,255,.14);
+    transform:translateY(-1px);
+}
+
+/* Поле с кнопкой «показать» */
+.auth-field__box--secret .auth-field__input{ padding-right:60px; }
+
+.auth-field__eye{
+    position:absolute;
+    right:10px;
+
+    width:42px;
+    height:42px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border:none;
+    border-radius:50%;
+    background:transparent;
+    color:var(--kr-muted-2);
+
+    cursor:pointer;
+    transition:.25s;
+}
+
+.auth-field__eye:hover{
+    background:var(--kr-blue-50);
+    color:var(--kr-blue-600);
+}
+
+.auth-field__eye svg{
+    width:21px;
+    height:21px;
+}
+
+.auth-field__eye .kr-eye-off{ display:none; }
+.auth-field__eye.is-open .kr-eye-on{ display:none; }
+.auth-field__eye.is-open .kr-eye-off{ display:block; }
+
+.auth-field__error{
+    font-size:13px;
+    font-weight:600;
+    color:var(--kr-danger);
+
+    animation:kr-shake .4s ease;
+}
+
+@keyframes kr-shake{
+    0%,100%{ transform:translateX(0); }
+    25%    { transform:translateX(-5px); }
+    75%    { transform:translateX(5px); }
+}
+
+/* ---------- Индикатор надёжности пароля ---------- */
+
+.auth-meter{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-top:2px;
+}
+
+.auth-meter__track{
+    flex:1;
+    height:6px;
+    border-radius:var(--kr-r-pill);
+    background:rgba(210,226,246,.8);
+    overflow:hidden;
+}
+
+.auth-meter__fill{
+    height:100%;
+    width:0;
+    border-radius:var(--kr-r-pill);
+    background:linear-gradient(90deg, var(--kr-blue-300), var(--kr-blue-500));
+    transition:width .4s ease, background .4s ease;
+}
+
+.auth-meter__label{
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--kr-muted-2);
+    min-width:74px;
+    text-align:right;
+}
+
+.auth-meter[data-level="1"] .auth-meter__fill{ width:25%;  background:linear-gradient(90deg,#F5A0AE,#E2445C); }
+.auth-meter[data-level="2"] .auth-meter__fill{ width:50%;  background:linear-gradient(90deg,#FFCE8A,#FF9F43); }
+.auth-meter[data-level="3"] .auth-meter__fill{ width:75%;  background:linear-gradient(90deg,#7FC4FF,#1974FF); }
+.auth-meter[data-level="4"] .auth-meter__fill{ width:100%; background:linear-gradient(90deg,#63D6A8,#12A06A); }
+
+.auth-meter[data-level="1"] .auth-meter__label{ color:var(--kr-danger); }
+.auth-meter[data-level="2"] .auth-meter__label{ color:#E08A2B; }
+.auth-meter[data-level="3"] .auth-meter__label{ color:var(--kr-blue-500); }
+.auth-meter[data-level="4"] .auth-meter__label{ color:var(--kr-ok); }
+
+/* ---------- Общая ошибка формы ---------- */
+
+.auth-alert{
+    padding:15px 18px;
+    border-radius:var(--kr-r-sm);
+
+    font-size:14px;
+    font-weight:600;
+
+    color:var(--kr-danger);
+    background:rgba(253,235,238,.9);
+    border:1px solid rgba(226,68,92,.22);
+
+    animation:kr-shake .4s ease;
+}
+
+/* ---------- Строка «запомнить / забыли» ---------- */
+
+.auth-form__row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+}
+
+.auth-check{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+
+    font-size:14.5px;
+    color:var(--kr-muted);
+    cursor:pointer;
+    user-select:none;
+}
+
+.auth-check input{
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+}
+
+.auth-check__mark{
+    width:22px;
+    height:22px;
+    flex-shrink:0;
+
+    border-radius:7px;
+    border:1.5px solid rgba(190,212,238,1);
+    background:rgba(255,255,255,.8);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    transition:.25s;
+}
+
+.auth-check__mark svg{
+    width:13px;
+    height:13px;
+    opacity:0;
+    transform:scale(.5);
+    transition:.25s;
+    color:#fff;
+}
+
+.auth-check input:checked + .auth-check__mark{
+    background:linear-gradient(180deg, var(--kr-blue-300), var(--kr-blue-500));
+    border-color:transparent;
+    box-shadow:0 6px 16px rgba(25,116,255,.32);
+}
+
+.auth-check input:checked + .auth-check__mark svg{
+    opacity:1;
+    transform:scale(1);
+}
+
+.auth-check input:focus-visible + .auth-check__mark{
+    box-shadow:0 0 0 4px rgba(47,134,255,.2);
+}
+
+.auth-agree{
+    align-items:flex-start;
+    line-height:1.45;
+}
+
+.auth-agree .auth-check__mark{ margin-top:1px; }
+
+.auth-link{
+    font-size:14.5px;
+    font-weight:700;
+    color:var(--kr-blue-600);
+    text-decoration:none;
+    transition:.2s;
+}
+
+.auth-link:hover{ color:var(--kr-blue-700); }
+
+/* ---------- Кнопка отправки ---------- */
+
+.auth-submit{
+    position:relative;
+    overflow:hidden;
+
+    height:60px;
+    margin-top:6px;
+
+    border:none;
+    border-radius:var(--kr-r-pill);
+
+    font-family:inherit;
+    font-size:17px;
+    font-weight:700;
+    color:#fff;
+
+    background:linear-gradient(180deg, var(--kr-blue-300), var(--kr-blue-500));
+    box-shadow:0 14px 34px rgba(25,116,255,.34);
+
+    cursor:pointer;
+    transition:transform .25s ease, box-shadow .25s ease;
+}
+
+.auth-submit::after{
+    content:"";
+    position:absolute;
+    top:-120%;
+    left:-60%;
+
+    width:60px;
+    height:340%;
+
+    background:linear-gradient(
+        90deg,
+        rgba(255,255,255,0),
+        rgba(255,255,255,.55),
+        rgba(255,255,255,0)
+    );
+
+    transform:rotate(22deg);
+    transition:left .6s ease;
+}
+
+.auth-submit:hover{
+    transform:translateY(-3px);
+    box-shadow:0 22px 48px rgba(25,116,255,.44);
+}
+
+.auth-submit:hover::after{ left:130%; }
+
+.auth-submit:active{ transform:translateY(-1px); }
+
+/* ---------- Низ формы ---------- */
+
+.auth-foot{
+    text-align:center;
+    font-size:14.5px;
+    color:var(--kr-muted);
+}
+
+.auth-foot__link{
+    border:none;
+    background:none;
+    padding:0;
+    margin-left:4px;
+
+    font-family:inherit;
+    font-size:inherit;
+    font-weight:700;
+    color:var(--kr-blue-600);
+
+    cursor:pointer;
+    transition:.2s;
+}
+
+.auth-foot__link:hover{
+    color:var(--kr-blue-700);
+    text-decoration:underline;
+}
+
+/* ==========================================================
+                        АДАПТИВ
+   ========================================================== */
+
+@media (max-width:1180px){
+    .auth-aside{ padding:48px 42px; }
+    .auth-panel{ padding:48px 42px; }
+    .auth-aside__title{ font-size:42px; }
+}
+
+@media (max-width:920px){
+    .auth-scene{ padding:130px 18px 60px; }
+
+    .auth-shell{
+        grid-template-columns:1fr;
+    }
+
+    .auth-aside{
+        border-right:none;
+        border-bottom:1px solid rgba(255,255,255,.6);
+    }
+
+    .auth-route{ height:150px; }
+    .auth-aside__title{ font-size:38px; }
+    .auth-aside__text{ font-size:16.5px; }
+}
+
+@media (max-width:560px){
+    .auth-scene{ padding:120px 14px 46px; }
+
+    .auth-aside{ padding:36px 26px; }
+    .auth-panel{ padding:36px 26px; }
+
+    .auth-aside__title{ font-size:32px; }
+    .auth-route{ height:120px; }
+    .auth-facts{ flex-wrap:wrap; }
+    .auth-facts__item{ min-width:calc(50% - 7px); }
+
+    .auth-field__input{ height:54px; }
+    .auth-submit{ height:56px; }
+}
+
+/* ==========================================================
+                   ДОСТУПНОСТЬ
+   ========================================================== */
+
+.auth-switcher__btn:focus-visible,
+.auth-submit:focus-visible,
+.auth-foot__link:focus-visible,
+.auth-field__eye:focus-visible,
+.auth-link:focus-visible{
+    outline:2px solid var(--kr-blue-600);
+    outline-offset:3px;
+}
+
+@media (prefers-reduced-motion:reduce){
+    .auth-sky__blob,
+    .auth-shell,
+    .auth-shell::before,
+    .auth-route__line,
+    .auth-route__halo,
+    .auth-aside__eyebrow,
+    .auth-aside__title,
+    .auth-aside__text,
+    .auth-route,
+    .auth-facts,
+    .auth-panel,
+    .auth-form.is-active > *{
+        animation:none !important;
+    }
+
+    .auth-route__plane-motion{ display:none; }
+}

@@ -1,7 +1,6 @@
 /* ===========================
-   HEADER
+   BASE
 =========================== */
-
 
 html,
 body{
@@ -27,6 +26,10 @@ body{
 
 }
 
+/* ===========================
+   HEADER — liquid glass
+=========================== */
+
 .header{
 
     position:absolute;
@@ -39,27 +42,66 @@ body{
 
     height:95px;
 
-    background:rgba(255,255,255,.94);
+    background:linear-gradient(
+        180deg,
+        rgba(255,255,255,.78) 0%,
+        rgba(255,255,255,.58) 100%
+    );
 
-    backdrop-filter:blur(18px);
+    backdrop-filter:blur(26px) saturate(190%);
 
-    -webkit-backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(26px) saturate(190%);
 
     border-bottom-left-radius:30px;
 
     border-bottom-right-radius:30px;
 
+    border-bottom:1px solid rgba(255,255,255,.6);
+
     box-shadow:
-        0 12px 35px rgba(34,88,188,.08);
+        inset 0 1px 0 rgba(255,255,255,.95),
+        inset 0 -14px 30px rgba(255,255,255,.35),
+        0 12px 35px rgba(34,88,188,.10);
+
+    isolation:isolate;
 
     z-index:100;
 
 }
+
+/* диагональный блик стекла */
+
+.header::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    z-index:-1;
+
+    pointer-events:none;
+
+    border-bottom-left-radius:30px;
+
+    border-bottom-right-radius:30px;
+
+    background:linear-gradient(
+        112deg,
+        rgba(255,255,255,.55) 0%,
+        rgba(255,255,255,0)   38%,
+        rgba(255,255,255,0)   64%,
+        rgba(255,255,255,.40) 100%
+    );
+
+}
+
 .header-container{
 
     width:1500px;
 
-    height:90px;
+    height:100%;
 
     margin:0 auto;
 
@@ -72,7 +114,7 @@ body{
     padding:0 42px;
 
     position:relative;
-    
+
 }
 
 /* ===========================
@@ -81,19 +123,25 @@ body{
 
 .logo{
 
-    display:flex;
+    display:inline-flex;
 
     align-items:center;
 
-    transform:translateY(8px);
+    align-self:center;
+
+    width:fit-content;
+
+    height:fit-content;
+
+    line-height:0;
 
 }
 
 .logo img{
 
-    width:280px;
+    height:52px;
 
-    height:auto;
+    width:auto;
 
     display:block;
 
@@ -135,7 +183,7 @@ body{
 
     font-size:20px;
 
-    font-weight:6700;
+    font-weight:700;
 
     height:52px;
 
@@ -143,7 +191,7 @@ body{
 
     border-radius:26px;
 
-    transition:all .25s ease;
+    transition:color .25s ease, background .25s ease, box-shadow .25s ease;
 
 }
 
@@ -153,7 +201,9 @@ body{
 
     color:#156BFF;
 
-    background:#F7FAFF;
+    background:rgba(255,255,255,.55);
+
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.9);
 
 }
 
@@ -165,13 +215,18 @@ body{
 
     background:linear-gradient(
         180deg,
-        #F7FBFF 0%,
-        #EDF5FF 100%
+        rgba(255,255,255,.90) 0%,
+        rgba(232,241,255,.70) 100%
     );
 
+    backdrop-filter:blur(10px) saturate(160%);
+
+    -webkit-backdrop-filter:blur(10px) saturate(160%);
+
     box-shadow:
-        inset 0 1px 1px rgba(255,255,255,.9),
-        0 8px 20px rgba(21,107,255,.08);
+        inset 0 1px 1px rgba(255,255,255,.95),
+        inset 0 -2px 4px rgba(21,107,255,.10),
+        0 8px 20px rgba(21,107,255,.10);
 
 }
 
@@ -195,7 +250,7 @@ body{
 
     text-decoration:none;
 
-    color:white;
+    color:#fff;
 
     font-size:23px;
 
@@ -210,9 +265,11 @@ body{
     );
 
     box-shadow:
+        inset 0 1px 1px rgba(255,255,255,.45),
+        inset 0 -3px 8px rgba(0,60,160,.25),
         0 10px 30px rgba(21,107,255,.35);
 
-    transition:.25s;
+    transition:transform .25s, box-shadow .25s;
 
 }
 
@@ -221,6 +278,8 @@ body{
     transform:translateY(-2px);
 
     box-shadow:
+        inset 0 1px 1px rgba(255,255,255,.55),
+        inset 0 -3px 8px rgba(0,60,160,.25),
         0 16px 38px rgba(21,107,255,.45);
 
 }
@@ -229,4 +288,30 @@ body{
 
     transform:translateY(0);
 
+}
+
+/* ===========================
+        LOGO
+=========================== */
+
+.logo{
+    display:block;
+    position:relative;
+
+    width:250px;      /* ширина зоны клика */
+    height:56px;      /* высота зоны клика */
+
+    overflow:hidden;  /* режет прозрачные поля картинки */
+    flex:0 0 auto;
+}
+
+.logo img{
+    position:absolute;
+    top:60%;
+    left:50%;
+    transform:translate(-50%,-50%);
+
+    width:290px;      /* крупнее коробки — рисунок заполняет её */
+    height:auto;
+    display:block;
 }

@@ -1,0 +1,331 @@
+{% extends "tours_main/base.html" %}
+{% load static %}
+
+{% block title %}{% if active_tab == "register" %}Регистрация{% else %}Вход{% endif %} — Кругосвет{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'tours_main/css/auth.css' %}">
+{% endblock %}
+
+
+{% block content %}
+<div class="auth-scene">
+
+  <!-- Живой фон -->
+  <div class="auth-sky" aria-hidden="true">
+    <span class="auth-sky__blob auth-sky__blob--1"></span>
+    <span class="auth-sky__blob auth-sky__blob--2"></span>
+    <span class="auth-sky__blob auth-sky__blob--3"></span>
+  </div>
+
+  <div class="auth-shell">
+
+    <!-- ==========================================
+                  ЛЕВАЯ ЧАСТЬ
+    =========================================== -->
+    <aside class="auth-aside">
+
+      <span class="auth-aside__eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z"/>
+          <circle cx="12" cy="12" r="10"/>
+        </svg>
+        Личный кабинет
+      </span>
+
+      <h1 class="auth-aside__title">
+        Ваш мир
+        <span>начинается здесь</span>
+      </h1>
+
+      <p class="auth-aside__text">
+        Сохраняйте направления, следите за ценами и бронируйте туры в пару кликов.
+      </p>
+
+      <!-- Подпись страницы: живой маршрут -->
+      <div class="auth-route" aria-hidden="true">
+        <svg viewBox="0 0 460 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+          <path id="krFlightPath"
+                class="auth-route__line"
+                d="M40 138 C 130 26, 320 26, 418 108"/>
+
+          <!-- Точка вылета -->
+          <g class="auth-route__pin auth-route__pin--a">
+            <circle class="auth-route__halo" cx="40" cy="138" r="9"/>
+            <circle class="auth-route__dot"  cx="40" cy="138" r="5.5"/>
+            <text class="auth-route__label" x="40" y="166" text-anchor="middle">Москва</text>
+          </g>
+
+          <!-- Точка прилёта -->
+          <g class="auth-route__pin auth-route__pin--b">
+            <circle class="auth-route__halo" cx="418" cy="108" r="9"/>
+            <circle class="auth-route__dot"  cx="418" cy="108" r="5.5"/>
+            <text class="auth-route__label" x="418" y="136" text-anchor="middle">Анталья</text>
+          </g>
+
+          <!-- Самолёт летит по маршруту -->
+          <g class="auth-route__plane-motion">
+            <path class="auth-route__plane"
+                  d="M0 -7 L20 0 L0 7 L4 0 Z"
+                  transform="translate(-8,0)"/>
+            <animateMotion dur="7s" repeatCount="indefinite" rotate="auto" keyPoints="0;1"
+                           keyTimes="0;1" calcMode="linear">
+              <mpath href="#krFlightPath"/>
+            </animateMotion>
+          </g>
+
+        </svg>
+      </div>
+
+      <div class="auth-facts">
+        <div class="auth-facts__item">
+          <span class="auth-facts__num">500+</span>
+          <span class="auth-facts__cap">направлений</span>
+        </div>
+        <div class="auth-facts__item">
+          <span class="auth-facts__num">24/7</span>
+          <span class="auth-facts__cap">поддержка</span>
+        </div>
+        <div class="auth-facts__item">
+          <span class="auth-facts__num">−30%</span>
+          <span class="auth-facts__cap">раннее бронирование</span>
+        </div>
+      </div>
+
+    </aside>
+
+
+    <!-- ==========================================
+                  ПРАВАЯ ЧАСТЬ — ФОРМЫ
+    =========================================== -->
+    <section class="auth-panel">
+
+      {% if messages %}
+        <ul class="auth-flash">
+          {% for message in messages %}
+            <li class="auth-flash__item auth-flash__item--{{ message.tags }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <div class="auth-switcher" role="tablist" data-active="{{ active_tab }}">
+
+        <button type="button" role="tab"
+                class="auth-switcher__btn{% if active_tab == 'login' %} is-active{% endif %}"
+                data-tab="login"
+                aria-selected="{% if active_tab == 'login' %}true{% else %}false{% endif %}">
+          Вход
+        </button>
+
+        <button type="button" role="tab"
+                class="auth-switcher__btn{% if active_tab == 'register' %} is-active{% endif %}"
+                data-tab="register"
+                aria-selected="{% if active_tab == 'register' %}true{% else %}false{% endif %}">
+          Регистрация
+        </button>
+
+        <span class="auth-switcher__thumb"></span>
+
+      </div>
+
+
+      <!-- ============ ФОРМА ВХОДА ============ -->
+      <form class="auth-form{% if active_tab == 'login' %} is-active{% endif %}"
+            data-panel="login" method="post" action="{% url 'auth' %}" novalidate>
+
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="login">
+
+        {% if login_form.non_field_errors %}
+          <div class="auth-alert">{{ login_form.non_field_errors.0 }}</div>
+        {% endif %}
+
+        <div class="auth-field">
+          <label class="auth-field__label" for="{{ login_form.username.id_for_label }}">
+            {{ login_form.username.label }}
+          </label>
+          <div class="auth-field__box">
+            {{ login_form.username }}
+          </div>
+          {% if login_form.username.errors %}
+            <span class="auth-field__error">{{ login_form.username.errors.0 }}</span>
+          {% endif %}
+        </div>
+
+        <div class="auth-field">
+          <label class="auth-field__label" for="{{ login_form.password.id_for_label }}">
+            {{ login_form.password.label }}
+          </label>
+          <div class="auth-field__box auth-field__box--secret">
+            {{ login_form.password }}
+            <button type="button" class="auth-field__eye" data-eye
+                    aria-label="Показать пароль">
+              <svg class="kr-eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg class="kr-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.6 6.2A9.9 9.9 0 0 1 12 6c6.4 0 10 7 10 7a17 17 0 0 1-3 3.9M6.6 6.7A17 17 0 0 0 2 13s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6"/>
+                <path d="m3 3 18 18"/>
+              </svg>
+            </button>
+          </div>
+          {% if login_form.password.errors %}
+            <span class="auth-field__error">{{ login_form.password.errors.0 }}</span>
+          {% endif %}
+        </div>
+
+        <div class="auth-form__row">
+          <label class="auth-check">
+            <input type="checkbox" name="remember_me">
+            <span class="auth-check__mark">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m20 6-11 11-5-5"/>
+              </svg>
+            </span>
+            <span>Запомнить меня</span>
+          </label>
+
+          {# Когда появится view восстановления пароля — подставь сюда его url #}
+          <a href="#" class="auth-link">Забыли пароль?</a>
+        </div>
+
+        <button type="submit" class="auth-submit">Войти</button>
+
+        <p class="auth-foot">
+          Нет аккаунта?
+          <button type="button" class="auth-foot__link" data-switch="register">Зарегистрироваться</button>
+        </p>
+
+      </form>
+
+
+      <!-- ============ ФОРМА РЕГИСТРАЦИИ ============ -->
+      <form class="auth-form{% if active_tab == 'register' %} is-active{% endif %}"
+            data-panel="register" method="post" action="{% url 'auth' %}" novalidate>
+
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="register">
+
+        {% if register_form.non_field_errors %}
+          <div class="auth-alert">{{ register_form.non_field_errors.0 }}</div>
+        {% endif %}
+
+        <div class="auth-field">
+          <label class="auth-field__label" for="{{ register_form.username.id_for_label }}">
+            {{ register_form.username.label }}
+          </label>
+          <div class="auth-field__box">
+            {{ register_form.username }}
+          </div>
+          {% if register_form.username.errors %}
+            <span class="auth-field__error">{{ register_form.username.errors.0 }}</span>
+          {% endif %}
+        </div>
+
+        <div class="auth-field">
+          <label class="auth-field__label" for="{{ register_form.email.id_for_label }}">
+            {{ register_form.email.label }}
+          </label>
+          <div class="auth-field__box">
+            {{ register_form.email }}
+          </div>
+          {% if register_form.email.errors %}
+            <span class="auth-field__error">{{ register_form.email.errors.0 }}</span>
+          {% endif %}
+        </div>
+
+        <div class="auth-field">
+          <label class="auth-field__label" for="{{ register_form.password1.id_for_label }}">
+            {{ register_form.password1.label }}
+          </label>
+          <div class="auth-field__box auth-field__box--secret">
+            {{ register_form.password1 }}
+            <button type="button" class="auth-field__eye" data-eye
+                    aria-label="Показать пароль">
+              <svg class="kr-eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg class="kr-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.6 6.2A9.9 9.9 0 0 1 12 6c6.4 0 10 7 10 7a17 17 0 0 1-3 3.9M6.6 6.7A17 17 0 0 0 2 13s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6"/>
+                <path d="m3 3 18 18"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="auth-meter" data-meter>
+            <span class="auth-meter__track">
+              <span class="auth-meter__fill"></span>
+            </span>
+            <span class="auth-meter__label" data-meter-label>надёжность</span>
+          </div>
+
+          {% if register_form.password1.errors %}
+            <span class="auth-field__error">{{ register_form.password1.errors.0 }}</span>
+          {% endif %}
+        </div>
+
+        <div class="auth-field">
+          <label class="auth-field__label" for="{{ register_form.password2.id_for_label }}">
+            {{ register_form.password2.label }}
+          </label>
+          <div class="auth-field__box auth-field__box--secret">
+            {{ register_form.password2 }}
+            <button type="button" class="auth-field__eye" data-eye
+                    aria-label="Показать пароль">
+              <svg class="kr-eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg class="kr-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.6 6.2A9.9 9.9 0 0 1 12 6c6.4 0 10 7 10 7a17 17 0 0 1-3 3.9M6.6 6.7A17 17 0 0 0 2 13s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6"/>
+                <path d="m3 3 18 18"/>
+              </svg>
+            </button>
+          </div>
+          {% if register_form.password2.errors %}
+            <span class="auth-field__error">{{ register_form.password2.errors.0 }}</span>
+          {% endif %}
+        </div>
+
+        <label class="auth-check auth-agree">
+          <input type="checkbox" name="accept_terms" required>
+          <span class="auth-check__mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m20 6-11 11-5-5"/>
+            </svg>
+          </span>
+          <span>Согласен с условиями использования и политикой конфиденциальности</span>
+        </label>
+
+        <button type="submit" class="auth-submit">Создать аккаунт</button>
+
+        <p class="auth-foot">
+          Уже есть аккаунт?
+          <button type="button" class="auth-foot__link" data-switch="login">Войти</button>
+        </p>
+
+      </form>
+
+    </section>
+
+  </div>
+
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+  <script src="{% static 'tours_main/js/auth.js' %}"></script>
+{% endblock %}

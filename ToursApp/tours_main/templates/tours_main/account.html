@@ -1,0 +1,799 @@
+{% extends 'tours_main/base.html' %}
+{% load static %}
+
+{% block title %}Личный кабинет — Кругосвет{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'tours_main/css/account.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- ==========================================================
+     SVG-фильтр преломления для «жидкого стекла»
+     ========================================================== -->
+<svg class="lg-filters" aria-hidden="true" focusable="false">
+    <filter id="lg-refraction" x="-20%" y="-20%" width="140%" height="140%"
+            color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.006 0.010"
+                      numOctaves="2" seed="17" result="noise"/>
+        <feGaussianBlur in="noise" stdDeviation="3" result="softNoise"/>
+        <feDisplacementMap in="SourceGraphic" in2="softNoise" scale="26"
+                           xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+</svg>
+
+<!-- ==========================================================
+     Живой фон
+     ========================================================== -->
+<div class="acc-bg" aria-hidden="true" data-parallax>
+    <span class="acc-bg__blob acc-bg__blob--1" data-depth="26"></span>
+    <span class="acc-bg__blob acc-bg__blob--2" data-depth="-34"></span>
+    <span class="acc-bg__blob acc-bg__blob--3" data-depth="18"></span>
+    <span class="acc-bg__blob acc-bg__blob--4" data-depth="-22"></span>
+    <span class="acc-bg__grain"></span>
+</div>
+
+<main class="acc">
+<div class="acc__container">
+
+    <!-- ======================================================
+         Приветствие
+         ====================================================== -->
+    <header class="acc-top reveal">
+        <div>
+            <p class="acc-top__eyebrow"><span class="dot"></span> Личный кабинет</p>
+            <h1 class="acc-top__title">
+                С возвращением,<br>
+                <span class="grad">{{ user_name|default:"Артём" }}</span>
+            </h1>
+            <p class="acc-top__sub">
+                {{ greeting|default:"До вашей ближайшей поездки осталось совсем немного. Проверьте документы и не пропустите онлайн-регистрацию." }}
+            </p>
+        </div>
+
+        <div class="acc-top__actions">
+            <button type="button" class="btn btn--ghost" data-magnetic data-toast="Менеджер уже печатает ответ ✈">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                Поддержка 24/7
+            </button>
+
+            <a href="{% url 'tours' %}" class="btn btn--primary" data-magnetic>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+                </svg>
+                Найти тур
+            </a>
+        </div>
+    </header>
+
+    <div class="acc__layout">
+
+        <!-- ==================================================
+             САЙДБАР
+             ================================================== -->
+        <aside class="acc-side glass glass--edge reveal" data-shine>
+
+            <div class="acc-side__user">
+                <div class="avatar">
+                    {% if avatar_url %}
+                        <img src="{{ avatar_url }}" alt="Аватар">
+                    {% else %}
+                        {{ user_initials|default:"АК" }}
+                    {% endif %}
+                    <span class="avatar__status" title="В сети"></span>
+                </div>
+
+                <div class="acc-side__meta">
+                    <h2 class="acc-side__name">{{ user_full_name|default:"Артём Ковалёв" }}</h2>
+                    <p class="acc-side__mail">{{ user_email|default:"artem@example.com" }}</p>
+
+                    <span class="acc-side__level">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.3 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/>
+                        </svg>
+                        {{ tier|default:"Gold" }} · участник с {{ member_since|default:"2023" }}
+                    </span>
+                </div>
+            </div>
+
+            <nav class="acc-nav" data-nav aria-label="Разделы кабинета">
+                <span class="acc-nav__pill" data-pill aria-hidden="true"></span>
+
+                <button type="button" class="acc-nav__item is-active" data-tab="overview">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/>
+                        <rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/>
+                    </svg>
+                    Обзор
+                </button>
+
+                <button type="button" class="acc-nav__item" data-tab="bookings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/>
+                        <path d="M14 6v12" stroke-dasharray="2 3"/>
+                    </svg>
+                    Мои бронирования
+                    <span class="acc-nav__count">{{ bookings|length|default:"4" }}</span>
+                </button>
+
+                <button type="button" class="acc-nav__item" data-tab="favorites">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.8 5.6a5.2 5.2 0 0 0-7.4 0L12 7l-1.4-1.4a5.2 5.2 0 1 0-7.4 7.4L12 21.5l8.8-8.5a5.2 5.2 0 0 0 0-7.4z"/>
+                    </svg>
+                    Избранное
+                    <span class="acc-nav__count">{{ favorites|length|default:"3" }}</span>
+                </button>
+
+                <button type="button" class="acc-nav__item" data-tab="bonuses">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/>
+                    </svg>
+                    Бонусы и мили
+                </button>
+
+                <button type="button" class="acc-nav__item" data-tab="documents">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>
+                    </svg>
+                    Документы
+                </button>
+
+                <button type="button" class="acc-nav__item" data-tab="notifications">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8a6 6 0 1 0-12 0c0 6-3 7-3 7h18s-3-1-3-7"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>
+                    </svg>
+                    Уведомления
+                    <span class="acc-nav__count">{{ unread_count|default:"2" }}</span>
+                </button>
+
+                <button type="button" class="acc-nav__item" data-tab="settings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3.2"/>
+                        <path d="M12 2.6l1.3 2.2 2.5-.3 .6 2.5 2.3 1.1-1.1 2.3 1.1 2.3-2.3 1.1-.6 2.5-2.5-.3L12 21.4l-1.3-2.2-2.5.3-.6-2.5-2.3-1.1L6.4 12 5.3 9.7l2.3-1.1.6-2.5 2.5.3z"/>
+                    </svg>
+                    Настройки
+                </button>
+            </nav>
+
+            <div class="acc-side__miles">
+                <p>Бонусный счёт</p>
+                <strong><span data-count="{{ miles|default:'14820' }}">{{ miles_display|default:'14 820' }}</span> миль</strong>
+                <div class="progress">
+                    <div class="progress__bar" data-progress="{{ tier_progress|default:'72' }}"></div>
+                </div>
+                <p class="acc-side__hint">
+                    До уровня {{ next_tier|default:"Platinum" }} — {{ miles_to_next|default:"2 400" }} миль
+                </p>
+            </div>
+
+            <form method="post" action="{{ logout_url|default:'/logout/' }}" data-confirm="Выйти из аккаунта?">
+                {% csrf_token %}
+                <button type="submit" class="acc-side__logout">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>
+                    </svg>
+                    Выйти из аккаунта
+                </button>
+            </form>
+        </aside>
+
+        <!-- ==================================================
+             КОНТЕНТ
+             ================================================== -->
+        <div class="acc-main">
+
+        <!-- ---------------- ОБЗОР ---------------- -->
+        <section class="panel is-active" data-panel="overview">
+
+            <!-- ближайшая поездка -->
+            <article class="glass trip" data-tilt="5" data-shine>
+                <svg class="trip__plane" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/>
+                </svg>
+
+                <div class="trip__inner">
+                    <div>
+                        <span class="trip__label">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg>
+                            Ближайшая поездка
+                        </span>
+
+                        <h2 class="trip__route">
+                            {{ trip.from_city|default:"Москва" }}
+                            <span>→</span>
+                            {{ trip.city|default:"Анталья" }}
+                        </h2>
+
+                        <p class="trip__meta">
+                            <span><i>Даты:</i>{{ trip.dates|default:"14 — 24 сентября 2026" }}</span>
+                            <span><i>Отель:</i>{{ trip.hotel|default:"Lara Beach Resort 5★" }}</span>
+                            <span><i>Номер брони:</i>{{ trip.code|default:"KR-2026-84213" }}</span>
+                        </p>
+
+                        <div class="trip__actions">
+                            <button type="button" class="btn btn--primary" data-magnetic data-toast="Ваучер и билеты отправлены на почту">
+                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>
+                                </svg>
+                                Скачать ваучер
+                            </button>
+                            <button type="button" class="btn btn--ghost" data-magnetic data-toast="Онлайн-регистрация откроется за 48 часов">
+                                Онлайн-регистрация
+                            </button>
+                            <button type="button" class="btn btn--ghost" data-magnetic data-toast="Запрос отправлен менеджеру">
+                                Изменить даты
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="countdown" data-countdown="{{ trip.depart_iso|default:'2026-09-14T09:40:00' }}">
+                        <p>До вылета осталось</p>
+                        <div class="countdown__grid">
+                            <div class="countdown__cell"><b data-cd="d">00</b><small>дней</small></div>
+                            <div class="countdown__cell"><b data-cd="h">00</b><small>часов</small></div>
+                            <div class="countdown__cell"><b data-cd="m">00</b><small>минут</small></div>
+                            <div class="countdown__cell"><b data-cd="s">00</b><small>секунд</small></div>
+                        </div>
+
+                        <div class="trip__ready">
+                            <p><span>Готовность к поездке</span><span>{{ trip.readiness|default:"75" }}%</span></p>
+                            <div class="progress">
+                                <div class="progress__bar" data-progress="{{ trip.readiness|default:'75' }}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- статистика -->
+            <div class="stats">
+                <div class="glass stat" data-tilt="6" data-shine>
+                    <div class="stat__icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17.8 19.2 16 11l3.5-3.5a2.1 2.1 0 0 0-3-3L13 8 4.8 6.2a.5.5 0 0 0-.5.8l3.9 4.3-2.2 2.2H3.5l-.7 1.6 3.2 1.6 1.6 3.2 1.6-.7v-2.5l2.2-2.2 4.3 3.9a.5.5 0 0 0 .8-.5z"/>
+                        </svg>
+                    </div>
+                    <div class="stat__value"><span data-count="12">12</span></div>
+                    <p class="stat__label">Поездок с Кругосвет</p>
+                    <span class="stat__delta">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                        +3 за год
+                    </span>
+                </div>
+
+                <div class="glass stat stat--violet" data-tilt="6" data-shine>
+                    <div class="stat__icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/>
+                        </svg>
+                    </div>
+                    <div class="stat__value"><span data-count="9">9</span></div>
+                    <p class="stat__label">Стран посещено</p>
+                    <span class="stat__delta">Турция · Италия · ОАЭ</span>
+                </div>
+
+                <div class="glass stat stat--mint" data-tilt="6" data-shine>
+                    <div class="stat__icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                    </div>
+                    <div class="stat__value"><span data-count="86400">86 400</span><small>₽</small></div>
+                    <p class="stat__label">Сэкономлено на акциях</p>
+                    <span class="stat__delta">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                        раннее бронирование
+                    </span>
+                </div>
+
+                <div class="glass stat stat--amber" data-tilt="6" data-shine>
+                    <div class="stat__icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.3 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/>
+                        </svg>
+                    </div>
+                    <div class="stat__value"><span data-count="14820">14 820</span></div>
+                    <p class="stat__label">Бонусных миль на счёте</p>
+                    <span class="stat__delta">≈ 14 820 ₽ скидки</span>
+                </div>
+            </div>
+
+            <!-- чек-лист + рекомендация -->
+            <div class="stats stats--split">
+                <div class="glass card" data-shine>
+                    <div class="card__head">
+                        <h3>Что нужно сделать до вылета</h3>
+                        <a href="#" class="link" data-tab-link="documents">Документы →</a>
+                    </div>
+
+                    <div class="timeline">
+                        <div class="timeline__item is-done">
+                            <h4>Бронь подтверждена</h4>
+                            <p>Отель Lara Beach Resort 5★ · подтверждение получено 3 августа</p>
+                        </div>
+                        <div class="timeline__item is-done">
+                            <h4>Оплата внесена полностью</h4>
+                            <p>184 900 ₽ · чек отправлен на {{ user_email|default:"artem@example.com" }}</p>
+                        </div>
+                        <div class="timeline__item">
+                            <h4>Загрузите страховку</h4>
+                            <p>Осталось 12 дней. Можно оформить прямо в кабинете за 2 минуты.</p>
+                        </div>
+                        <div class="timeline__item">
+                            <h4>Онлайн-регистрация на рейс</h4>
+                            <p>Откроется 12 сентября в 09:40 — пришлём push и письмо.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass card" data-shine>
+                    <div class="card__head">
+                        <h3>Вам может понравиться</h3>
+                        <a href="{% url 'tours' %}" class="link">Все туры →</a>
+                    </div>
+
+                    <div class="favs favs--single">
+                        {% for t in recommended %}
+                        <article class="glass fav {{ t.grad|default:'g--rose' }}" data-tilt="7" data-shine>
+                            <div class="fav__media">
+                                {% if t.img %}<img src="{{ t.img }}" alt="{{ t.title }}">{% endif %}
+                                <span class="fav__price">от {{ t.price }} ₽</span>
+                            </div>
+                            <div class="fav__body">
+                                <h3>{{ t.title }}</h3>
+                                <p>{{ t.subtitle }}</p>
+                                <div class="fav__row">
+                                    <span class="rating">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.3 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
+                                        {{ t.rating }}
+                                    </span>
+                                    <button type="button" class="btn btn--soft btn--sm" data-magnetic data-toast="Тур добавлен в избранное">В избранное</button>
+                                </div>
+                            </div>
+                        </article>
+                        {% empty %}
+                        <div class="empty">
+                            <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                            <b>Пока нечего предложить</b>
+                            <span>Забронируйте первый тур — и здесь появятся персональные подборки.</span>
+                        </div>
+                    {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ---------------- БРОНИРОВАНИЯ ---------------- -->
+        <section class="panel" data-panel="bookings">
+            <div class="sec-head">
+                <div>
+                    <h2>Мои бронирования</h2>
+                    <p>Все ваши туры, ваучеры и статусы оплаты в одном месте.</p>
+                </div>
+                <div class="filters" data-filters>
+                    <button type="button" class="chip is-active" data-filter="all">Все</button>
+                    <button type="button" class="chip" data-filter="upcoming">Предстоящие</button>
+                    <button type="button" class="chip" data-filter="done">Завершённые</button>
+                    <button type="button" class="chip" data-filter="canceled">Отменённые</button>
+                </div>
+            </div>
+
+            <div class="bookings" data-bookings>
+                {% for b in bookings %}
+                <article class="glass booking reveal {{ b.grad|default:'g--sea' }}"
+                         data-status="{{ b.status }}" data-shine>
+                    <div class="booking__thumb">
+                        {% if b.img %}<img src="{{ b.img }}" alt="{{ b.title }}">{% else %}{{ b.city|slice:":2" }}{% endif %}
+                    </div>
+
+                    <div>
+                        <h3 class="booking__title">
+                            {{ b.title }}
+                            <span class="badge badge--{{ b.tone }}">{{ b.status_label }}</span>
+                        </h3>
+                        <p class="booking__meta">
+                            <span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                                {{ b.dates }}
+                            </span>
+                            <span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/></svg>
+                                {{ b.hotel }}
+                            </span>
+                            <span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.4"/><path d="M2.5 20c0-3.4 2.9-6 6.5-6s6.5 2.6 6.5 6"/><path d="M17 9h5M19.5 6.5v5"/></svg>
+                                {{ b.guests }}
+                            </span>
+                        </p>
+                        <span class="booking__code">№ {{ b.code }}</span>
+                    </div>
+
+                    <div class="booking__side">
+                        <div class="booking__price">
+                            {{ b.price }} ₽
+                            <small>{{ b.payment }}</small>
+                        </div>
+                        <div class="u-row-8">
+                            <button type="button" class="btn btn--soft btn--sm" data-magnetic data-toast="Детали брони {{ b.code }}">Детали</button>
+                            <button type="button" class="btn btn--ghost btn--sm btn--icon" data-magnetic data-toast="Ваучер скачан" title="Скачать ваучер">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </article>
+                {% empty %}
+                <div class="glass card empty">
+                    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                    <b>Бронирований пока нет</b>
+                    <span>Выберите тур в каталоге — он появится здесь сразу после оформления.</span>
+                </div>
+            {% endfor %}
+            </div>
+
+            <div class="glass card empty" data-empty hidden>
+                <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <b>Здесь пока пусто</b>
+                <span>В этой категории бронирований нет — попробуйте другой фильтр.</span>
+            </div>
+        </section>
+
+        <!-- ---------------- ИЗБРАННОЕ ---------------- -->
+        <section class="panel" data-panel="favorites">
+            <div class="sec-head">
+                <div>
+                    <h2>Избранные туры</h2>
+                    <p>Мы следим за ценами и напишем, если тур подешевеет.</p>
+                </div>
+                <a href="{% url 'tours' %}" class="btn btn--primary btn--sm" data-magnetic>Подобрать ещё</a>
+            </div>
+
+            <div class="favs">
+                {% for t in favorites %}
+                <article class="glass fav reveal {{ t.grad|default:'g--aqua' }}" data-tilt="8" data-shine>
+                    <div class="fav__media">
+                        {% if t.img %}<img src="{{ t.img }}" alt="{{ t.title }}">{% endif %}
+                        <button type="button" class="fav__heart" data-unfav aria-label="Убрать из избранного">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20.8 5.6a5.2 5.2 0 0 0-7.4 0L12 7l-1.4-1.4a5.2 5.2 0 1 0-7.4 7.4L12 21.5l8.8-8.5a5.2 5.2 0 0 0 0-7.4z"/>
+                            </svg>
+                        </button>
+                        <span class="fav__price">от {{ t.price }} ₽</span>
+                    </div>
+                    <div class="fav__body">
+                        <h3>{{ t.title }}</h3>
+                        <p>{{ t.subtitle }}</p>
+                        <div class="fav__row">
+                            <span class="rating">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.3 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
+                                {{ t.rating }}
+                            </span>
+                            <button type="button" class="btn btn--soft btn--sm" data-magnetic data-toast="Менеджер свяжется с вами">Забронировать</button>
+                        </div>
+                    </div>
+                </article>
+                {% empty %}
+                <div class="glass card empty">
+                    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                    <b>В избранном пусто</b>
+                    <span>Нажимайте на сердечко в каталоге, чтобы следить за ценой тура.</span>
+                </div>
+            {% endfor %}
+            </div>
+        </section>
+
+        <!-- ---------------- БОНУСЫ ---------------- -->
+        <section class="panel" data-panel="bonuses">
+            <div class="sec-head">
+                <div>
+                    <h2>Бонусы и мили</h2>
+                    <p>1 миля = 1 ₽ скидки. Мили начисляются за каждую поездку и отзыв.</p>
+                </div>
+            </div>
+
+            <div class="loyalty">
+                <div class="card3d" data-tilt="12" data-shine>
+                    <div class="card3d__inner">
+                        <div class="card3d__top">
+                            <span class="card3d__brand">Кругосвет</span>
+                            <span class="card3d__tier">{{ tier|default:"Gold" }}</span>
+                        </div>
+
+                        <div class="card3d__miles">
+                            <small>Доступно миль</small>
+                            <b data-count="{{ miles|default:'14820' }}">{{ miles_display|default:'14 820' }}</b>
+                        </div>
+
+                        <div class="card3d__num">
+                            <span>{{ card_number|default:"5412 •••• •••• 8842" }}</span>
+                            <span>{{ user_full_name|default:"ARTEM KOVALEV"|upper }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="u-stack-16">
+                    <div class="glass card" data-shine>
+                        <div class="card__head">
+                            <h3>До уровня {{ next_tier|default:"Platinum" }}</h3>
+                            <span class="badge badge--blue">{{ tier_progress|default:"72" }}%</span>
+                        </div>
+                        <div class="progress progress--lg">
+                            <div class="progress__bar" data-progress="{{ tier_progress|default:'72' }}"></div>
+                        </div>
+                        <p class="card__note">
+                            Осталось {{ miles_to_next|default:"2 400" }} миль или одна поездка от 7 ночей.
+                            На Platinum: бесплатный трансфер, ранний заезд и +15% к начислению.
+                        </p>
+                    </div>
+
+                    <div class="perks">
+                        <div class="glass perk" data-shine>
+                            <span class="perk__ic">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M12 3v18"/></svg>
+                            </span>
+                            <div><h4>Кэшбэк милями</h4><p>За каждую бронь тура</p></div>
+                            <span class="perk__val">5%</span>
+                        </div>
+                        <div class="glass perk" data-shine>
+                            <span class="perk__ic">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18"/></svg>
+                            </span>
+                            <div><h4>Приоритетная бронь</h4><p>Места из закрытой квоты</p></div>
+                            <span class="perk__val">Есть</span>
+                        </div>
+                        <div class="glass perk" data-shine>
+                            <span class="perk__ic">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                            </span>
+                            <div><h4>Поздний выезд</h4><p>В отелях-партнёрах</p></div>
+                            <span class="perk__val">до 16:00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass card" data-shine>
+                <div class="card__head">
+                    <h3>История начислений</h3>
+                    <a href="#" class="link">Выгрузить CSV</a>
+                </div>
+
+                <div class="miles-log">
+                    {% for m in miles_log %}
+                    <div class="miles-log__row">
+                        <b>{{ m.title }}</b>
+                        <span>{{ m.date }}</span>
+                        <i class="{{ m.sign }}">{% if m.sign == 'plus' %}+{% else %}−{% endif %}{{ m.amount }}</i>
+                    </div>
+                    {% empty %}
+                    <div class="empty">
+                        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                        <b>Операций ещё не было</b>
+                        <span>Мили начисляются после первой поездки и за отзывы о ней.</span>
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <!-- ---------------- ДОКУМЕНТЫ ---------------- -->
+        <section class="panel" data-panel="documents">
+            <div class="sec-head">
+                <div>
+                    <h2>Документы и туристы</h2>
+                    <p>Данные хранятся в зашифрованном виде и подставляются в бронь автоматически.</p>
+                </div>
+                <button type="button" class="btn btn--primary btn--sm" data-magnetic data-toast="Добавьте туриста в форме ниже">
+                    + Добавить туриста
+                </button>
+            </div>
+
+            <div class="docs">
+                {% for d in documents %}
+                <div class="glass doc" data-shine>
+                    <span class="doc__ic">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>
+                        </svg>
+                    </span>
+                    <div class="doc__body">
+                        <h4>{{ d.title }}</h4>
+                        <p>{{ d.meta }}</p>
+                    </div>
+                    <span class="badge badge--{{ d.tone }}">{{ d.status }}</span>
+                </div>
+                {% empty %}
+                <div class="glass card empty">
+                    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                    <b>Документы не добавлены</b>
+                    <span>Загрузите скан загранпаспорта — он подставится в бронь автоматически.</span>
+                </div>
+            {% endfor %}
+            </div>
+
+            <label class="dropzone" data-dropzone>
+                <input type="file" hidden multiple>
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 9l5-5 5 5"/><path d="M12 4v12"/>
+                </svg>
+                <b>Перетащите скан паспорта или визы</b>
+                <span>PDF, JPG или PNG до 10 МБ · данные проверит менеджер</span>
+            </label>
+        </section>
+
+        <!-- ---------------- УВЕДОМЛЕНИЯ ---------------- -->
+        <section class="panel" data-panel="notifications">
+            <div class="sec-head">
+                <div>
+                    <h2>Уведомления</h2>
+                    <p>Изменения по броням, цены на избранные туры и напоминания.</p>
+                </div>
+                <button type="button" class="btn btn--ghost btn--sm" data-magnetic data-read-all>Прочитать все</button>
+            </div>
+
+            <div class="glass card" data-shine>
+                <div class="notes">
+                    {% for n in notifications %}
+                    <div class="note {% if n.unread %}is-unread{% endif %}" data-note>
+                        <span class="note__ic note__ic--{{ n.tone }}">
+                            {% if n.tone == 'mint' %}
+                                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m4 12.5 5.2 5.2L20 6.9"/>
+                                </svg>
+                            {% else %}
+                                {% if n.tone == 'amber' %}
+                                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 3 2.5 20h19z"/><path d="M12 9.5v4.5"/><path d="M12 17.3h.01"/>
+                                    </svg>
+                                {% else %}
+                                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M18 8a6 6 0 1 0-12 0c0 6-3 7-3 7h18s-3-1-3-7"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>
+                                    </svg>
+                                {% endif %}
+                            {% endif %}
+                        </span>
+                        <div>
+                            <h4>{{ n.title }}</h4>
+                            <p>{{ n.text }}</p>
+                        </div>
+                        <time>{{ n.time }}</time>
+                    </div>
+                    {% empty %}
+                    <div class="empty">
+                        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                        <b>Уведомлений нет</b>
+                        <span>Здесь появятся изменения по броням и напоминания о поездке.</span>
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+
+            <div class="glass card" data-shine>
+                <div class="card__head"><h3>Куда присылать</h3></div>
+
+                <div class="switch-row">
+                    <div><h4>Email</h4><p>Ваучеры, чеки и подтверждения брони</p></div>
+                    <label class="switch"><input type="checkbox" checked><span class="switch__track"></span><span class="switch__thumb"></span></label>
+                </div>
+                <div class="switch-row">
+                    <div><h4>SMS</h4><p>Срочные изменения по рейсу и трансферу</p></div>
+                    <label class="switch"><input type="checkbox" checked><span class="switch__track"></span><span class="switch__thumb"></span></label>
+                </div>
+                <div class="switch-row">
+                    <div><h4>Telegram-бот</h4><p>Онлайн-статус брони и чат с менеджером</p></div>
+                    <label class="switch"><input type="checkbox"><span class="switch__track"></span><span class="switch__thumb"></span></label>
+                </div>
+                <div class="switch-row">
+                    <div><h4>Снижение цены на избранное</h4><p>Напишем, как только тур подешевеет</p></div>
+                    <label class="switch"><input type="checkbox" checked><span class="switch__track"></span><span class="switch__thumb"></span></label>
+                </div>
+            </div>
+        </section>
+
+        <!-- ---------------- НАСТРОЙКИ ---------------- -->
+        <section class="panel" data-panel="settings">
+            <div class="sec-head">
+                <div>
+                    <h2>Настройки профиля</h2>
+                    <p>Эти данные подставляются в бронирование — держите их актуальными.</p>
+                </div>
+            </div>
+
+            <form class="glass card" method="post" action="" data-shine>
+                {% csrf_token %}
+                <div class="card__head"><h3>Личные данные</h3></div>
+
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="f-first">Имя</label>
+                        <input id="f-first" name="first_name" value="{{ user_first_name|default:'Артём' }}" placeholder="Артём">
+                    </div>
+                    <div class="field">
+                        <label for="f-last">Фамилия</label>
+                        <input id="f-last" name="last_name" value="{{ user_last_name|default:'Ковалёв' }}" placeholder="Ковалёв">
+                    </div>
+                    <div class="field">
+                        <label for="f-mail">Email</label>
+                        <input id="f-mail" type="email" name="email" value="{{ user_email|default:'artem@example.com' }}">
+                    </div>
+                    <div class="field">
+                        <label for="f-phone">Телефон</label>
+                        <input id="f-phone" name="phone" value="{{ user_phone|default:'+7 999 123-45-67' }}">
+                    </div>
+                    <div class="field">
+                        <label for="f-birth">Дата рождения</label>
+                        <input id="f-birth" type="date" name="birth_date" value="{{ user_birth|default:'1996-04-18' }}">
+                    </div>
+                    <div class="field">
+                        <label for="f-city">Город вылета</label>
+                        <select id="f-city" name="home_city">
+                            <option>Москва</option>
+                            <option>Санкт-Петербург</option>
+                            <option>Казань</option>
+                            <option>Екатеринбург</option>
+                            <option>Новосибирск</option>
+                        </select>
+                    </div>
+                    <div class="field field--wide">
+                        <label for="f-note">Пожелания к поездкам</label>
+                        <textarea id="f-note" name="preferences" rows="3" placeholder="Например: только прямые рейсы, отель у моря, номер для некурящих">{{ user_prefs|default:'' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn--primary" data-magnetic>Сохранить изменения</button>
+                    <button type="reset" class="btn btn--ghost" data-magnetic>Отменить</button>
+                </div>
+            </form>
+
+            <div class="glass card" data-shine>
+                <div class="card__head"><h3>Безопасность</h3></div>
+
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="p-old">Текущий пароль</label>
+                        <input id="p-old" type="password" placeholder="••••••••">
+                    </div>
+                    <div class="field">
+                        <label for="p-new">Новый пароль</label>
+                        <input id="p-new" type="password" placeholder="Минимум 8 символов">
+                    </div>
+                </div>
+
+                <div class="switch-row u-mt-8">
+                    <div><h4>Двухфакторная аутентификация</h4><p>Код подтверждения при входе с нового устройства</p></div>
+                    <label class="switch"><input type="checkbox"><span class="switch__track"></span><span class="switch__thumb"></span></label>
+                </div>
+
+                <button type="button" class="btn btn--soft u-mt-16" data-magnetic data-toast="Пароль обновлён">
+                    Обновить пароль
+                </button>
+            </div>
+
+            <div class="danger">
+                <div>
+                    <h4>Удалить аккаунт</h4>
+                    <p>История поездок и накопленные мили будут удалены безвозвратно.</p>
+                </div>
+                <button type="button" class="btn btn--danger btn--sm" data-magnetic
+                        data-confirm="Удалить аккаунт без возможности восстановления?"
+                        data-toast="Запрос на удаление принят">
+                    Удалить
+                </button>
+            </div>
+        </section>
+
+        </div><!-- /.acc-main -->
+    </div><!-- /.acc__layout -->
+</div>
+</main>
+
+<div class="toast-host" data-toasts aria-live="polite"></div>
+
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'tours_main/js/account.js' %}" defer></script>
+{% endblock %}
