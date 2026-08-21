@@ -1,5 +1,3 @@
-from django.db import models
-
 import random
 import string
 from datetime import date
@@ -8,6 +6,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
 
 
 # ---------------------------------------------------------------------------
@@ -21,10 +20,21 @@ TOUR_MODEL = 'tours_main.Tour'
 CARD_GRADIENTS = ['g--sea', 'g--sun', 'g--violet', 'g--mint',
                   'g--aqua', 'g--forest', 'g--coral', 'g--rose']
 
+# Сколько процентов от стоимости тура возвращается милями за завершённую поездку
+MILES_CASHBACK = 5
+
 
 def gradient_for(obj_id):
     """Один и тот же тур всегда получает один и тот же цвет карточки."""
     return CARD_GRADIENTS[(obj_id or 0) % len(CARD_GRADIENTS)]
+
+
+def spaced(value):
+    """123456 -> «123 456»"""
+    try:
+        return f'{int(value):,}'.replace(',', ' ')
+    except (TypeError, ValueError):
+        return str(value or '0')
 
 
 # ---------------------------------------------------------------------------
@@ -44,10 +54,11 @@ class Profile(models.Model):
         ('platinum', 'Platinum'),
     ]
 
-    # пороги миль для перехода на следующий уровень
-    TIER_GOALS = {'basic': 5000, 'silver': 12000, 'gold': 20000, 'platinum': 20000}
-    TIER_NEXT = {'basic': 'Silver', 'silver': 'Gold',
-                 'gold': 'Platinum', 'platinum': 'Platinum'}
+    # Порог входа на уровень: столько миль нужно накопить, чтобы его получить.
+    TIER_ENTRY = {'basic': 0, 'silver': 5000, 'gold': 12000, 'platinum': 20000}
+    TIER_ORDER = ['basic', 'silver', 'gold', 'platinum']
+    TIER_NEXT = {'basic': 'silver', 'silver': 'gold',
+                 'gold': 'platinum', 'platinum': 'platinum'}
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                                 related_name='profile', verbose_name='Пользователь')
@@ -76,6 +87,31 @@ class Profile(models.Model):
     def __str__(self):
         return f'{self.user.get_full_name() or self.user.username}'
 
+    # -----------------------------------------------------------------------
+    #  Уровень пересчитывается САМ при каждом сохранении.
+    #  Поэтому неважно, откуда пришли мили: из админки, из поездки или
+    #  из ручного начисления менеджером — статус всегда соответствует милям.
+    # -----------------------------------------------------------------------
+    def compute_tier(self):
+        earned = 'basic'
+        for name in self.TIER_ORDER:
+            if self.miles >= self.TIER_ENTRY[name]:
+                earned = name
+        return earned
+
+    def save(self, *args, **kwargs):
+        self.tier = self.compute_tier()
+
+        # если сохраняем точечно (update_fields), уровень всё равно должен уехать в базу
+        update_fields = kwargs.get('update_fields')
+        if update_fields is not None:
+            fields = set(update_fields)
+            if 'miles' in fields:
+                fields.add('tier')
+                kwargs['update_fields'] = fields
+
+        super().save(*args, **kwargs)
+
     # --- вычисляемые поля для шаблона --------------------------------------
     @property
     def full_name(self):
@@ -89,25 +125,44 @@ class Profile(models.Model):
 
     @property
     def miles_display(self):
-        return f'{self.miles:,}'.replace(',', ' ')
+        return spaced(self.miles)
 
     @property
     def next_tier(self):
-        return self.TIER_NEXT.get(self.tier, 'Platinum')
+        """Название следующего уровня, как его видит человек: «Gold»."""
+        key = self.TIER_NEXT.get(self.tier, 'platinum')
+        return dict(self.TIER_CHOICES).get(key, 'Platinum')
+
+    @property
+    def is_top_tier(self):
+        return self.tier == 'platinum'
 
     @property
     def tier_goal(self):
-        return self.TIER_GOALS.get(self.tier, 5000)
+        """Сколько миль нужно накопить для следующего уровня."""
+        key = self.TIER_NEXT.get(self.tier, 'platinum')
+        return self.TIER_ENTRY.get(key, self.TIER_ENTRY['platinum'])
 
     @property
     def tier_progress(self):
+        """Прогресс внутри текущего уровня, %."""
+        if self.is_top_tier:
+            return 100
+
+        start = self.TIER_ENTRY.get(self.tier, 0)
         goal = self.tier_goal
-        return min(100, round(self.miles / goal * 100)) if goal else 100
+        span = goal - start
+
+        if span <= 0:
+            return 100
+
+        return max(0, min(100, round((self.miles - start) / span * 100)))
 
     @property
     def miles_to_next(self):
-        left = max(0, self.tier_goal - self.miles)
-        return f'{left:,}'.replace(',', ' ')
+        if self.is_top_tier:
+            return '0'
+        return spaced(max(0, self.tier_goal - self.miles))
 
     @property
     def card_number(self):
@@ -117,23 +172,19 @@ class Profile(models.Model):
     def member_since(self):
         return self.created_at.year if self.created_at else date.today().year
 
+    # --- операции ----------------------------------------------------------
     def add_miles(self, amount, title):
         """Начислить (или списать) мили и записать операцию в историю."""
+        if not amount:
+            return None
+
         self.miles = max(0, self.miles + amount)
         self.save(update_fields=['miles'])
-        MilesEntry.objects.create(user=self.user, title=title, amount=amount)
-        self.refresh_tier()
+        return MilesEntry.objects.create(user=self.user, title=title, amount=amount)
 
     def refresh_tier(self):
-        """Поднять уровень, если мили перевалили за порог."""
-        order = ['basic', 'silver', 'gold', 'platinum']
-        new = 'basic'
-        for name in order:
-            if self.miles >= self.TIER_GOALS[name] and name != 'platinum':
-                new = order[order.index(name) + 1]
-        if new != self.tier:
-            self.tier = new
-            self.save(update_fields=['tier'])
+        """Оставлено для совместимости — save() и так всё пересчитает."""
+        self.save(update_fields=['miles'])
 
 
 # ---------------------------------------------------------------------------
@@ -174,6 +225,10 @@ class Booking(models.Model):
     payment = models.CharField('Оплата', max_length=12, choices=PAYMENT, default='partial')
     readiness = models.PositiveSmallIntegerField('Готовность к поездке, %', default=40)
 
+    miles_awarded = models.BooleanField(
+        'Мили за поездку начислены', default=False,
+        help_text='Ставится автоматически, когда поездка становится завершённой')
+
     created_at = models.DateTimeField('Создана', auto_now_add=True)
 
     class Meta:
@@ -186,9 +241,63 @@ class Booking(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.code:
+            year = self.date_from.year if self.date_from else date.today().year
             suffix = ''.join(random.choices(string.digits, k=5))
-            self.code = f'KR-{self.date_from.year if self.date_from else date.today().year}-{suffix}'
+            self.code = f'KR-{year}-{suffix}'
+
+        # отель не заполнили руками — берём отель из карточки тура
+        if not self.hotel_name and self.tour_id:
+            self.hotel_name = getattr(self.tour, 'hotel', '') or ''
+
+        # цену не заполнили — берём цену тура из админки
+        if not self.price and self.tour_id:
+            self.price = getattr(self.tour, 'price', 0) or 0
+
         super().save(*args, **kwargs)
+
+    # --- автоматика ---------------------------------------------------------
+    def sync_status(self):
+        """Поездка, у которой прошла дата выезда, сама становится завершённой.
+
+        Возвращает True, если статус поменялся — тогда вьюха начислит мили.
+        """
+        if self.status != 'upcoming' or not self.date_to:
+            return False
+
+        if self.date_to < timezone.localdate():
+            self.status = 'done'
+            self.save(update_fields=['status'])
+            return True
+
+        return False
+
+    @property
+    def miles_earned(self):
+        return int(int(self.price) * MILES_CASHBACK / 100)
+
+    def award_miles(self):
+        """Начислить мили за завершённую поездку — ровно один раз."""
+        if self.miles_awarded or self.status != 'done':
+            return False
+
+        profile = getattr(self.user, 'profile', None)
+        if profile is None:
+            return False
+
+        earned = self.miles_earned
+        profile.add_miles(earned, f'Начисление за поездку {self.code}')
+
+        self.miles_awarded = True
+        self.save(update_fields=['miles_awarded'])
+
+        if earned:
+            Notification.objects.create(
+                user=self.user,
+                title=f'Начислено {spaced(earned)} миль',
+                text=f'За поездку {self.code}. Мили можно потратить на следующий тур.',
+                tone='mint',
+            )
+        return True
 
     # --- для шаблона --------------------------------------------------------
     @property
@@ -211,7 +320,7 @@ class Booking(models.Model):
 
     @property
     def price_display(self):
-        return f'{int(self.price):,}'.replace(',', ' ')
+        return spaced(self.price)
 
     @property
     def nights(self):
@@ -264,7 +373,7 @@ class MilesEntry(models.Model):
 
     @property
     def amount_display(self):
-        return f'{abs(self.amount):,}'.replace(',', ' ')
+        return spaced(abs(self.amount))
 
 
 # ---------------------------------------------------------------------------
@@ -321,22 +430,33 @@ class Notification(models.Model):
     def __str__(self):
         return self.title
 
+    @property
+    def unread(self):
+        """Шаблону удобнее спрашивать «непрочитано?», чем «not is_read»."""
+        return not self.is_read
+
 
 # ---------------------------------------------------------------------------
 #  СИГНАЛ: профиль создаётся сам при регистрации пользователя
 # ---------------------------------------------------------------------------
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_profile_for_new_user(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-        Notification.objects.create(
-            user=instance,
-            title='Добро пожаловать в Кругосвет!',
-            text='Заполните профиль — и мы подберём туры под ваши даты и город вылета.',
-            tone='mint',
-        )
+    if not created:
+        return
+
+    Profile.objects.get_or_create(user=instance)
+
+    Notification.objects.create(
+        user=instance,
+        title='Добро пожаловать в Кругосвет!',
+        text='Заполните профиль — и мы подберём туры под ваши даты и город вылета.',
+        tone='mint',
+    )
 
 
+# ---------------------------------------------------------------------------
+#  НАПРАВЛЕНИЯ  (Турция, Япония, Китай …) — источник рекомендаций в кабинете
+# ---------------------------------------------------------------------------
 class Destination(models.Model):
 
     name = models.CharField(
@@ -360,19 +480,37 @@ class Destination(models.Model):
     )
 
     price = models.PositiveIntegerField(
-    verbose_name="Цена от"
-    )   
+        verbose_name="Цена от"
+    )
 
+    is_featured = models.BooleanField(
+        default=True,
+        verbose_name="Рекомендовать в личном кабинете",
+        help_text="Снимите галочку, если направление не должно попадать "
+                  "в блок «Рекомендуемые направления»"
+    )
+
+    order = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Порядок вывода"
+    )
 
     def __str__(self):
         return self.name
 
+    @property
+    def price_display(self):
+        return spaced(self.price)
+
+    @property
+    def tours_count(self):
+        return self.tours.count()
 
     class Meta:
-
         verbose_name = "Направление"
-
         verbose_name_plural = "Направления"
+        ordering = ["order", "name"]
+
 
 class Tour(models.Model):
 
@@ -456,8 +594,12 @@ class Tour(models.Model):
 
     def __str__(self):
         return self.title
-    
-    
+
+    @property
+    def price_display(self):
+        return spaced(self.price)
+
+
 class TourImage(models.Model):
 
     tour = models.ForeignKey(
@@ -494,4 +636,3 @@ class TourImage(models.Model):
     def __str__(self):
 
         return f"{self.tour.title} ({self.order})"
-

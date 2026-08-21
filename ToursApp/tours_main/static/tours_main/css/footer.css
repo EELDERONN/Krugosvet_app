@@ -1,0 +1,542 @@
+/* ===========================================================================
+   Кругосвет — FOOTER
+   Тот же язык, что и у шапки: liquid glass, синий #156BFF, текст #36425A.
+   Подключается в base.html и живёт на каждой странице сайта.
+   =========================================================================== */
+
+.footer {
+
+    position: relative;
+
+    margin-top: 90px;
+
+    padding: 0;
+
+    color: #36425A;
+
+    font-family: "Inter", sans-serif;
+
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, .62) 0%,
+        rgba(255, 255, 255, .86) 100%
+    );
+
+    backdrop-filter: blur(26px) saturate(190%);
+
+    -webkit-backdrop-filter: blur(26px) saturate(190%);
+
+    border-top: 1px solid rgba(255, 255, 255, .75);
+
+    border-top-left-radius: 30px;
+
+    border-top-right-radius: 30px;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .95),
+        inset 0 14px 30px rgba(255, 255, 255, .35),
+        0 -12px 35px rgba(34, 88, 188, .10);
+
+    isolation: isolate;
+
+    overflow: hidden;
+
+}
+
+/* мягкое синее свечение из-под футера */
+
+.footer::before {
+
+    content: "";
+
+    position: absolute;
+
+    z-index: -1;
+
+    left: 50%;
+
+    bottom: -180px;
+
+    width: 780px;
+
+    height: 340px;
+
+    transform: translateX(-50%);
+
+    pointer-events: none;
+
+    border-radius: 50%;
+
+    background: radial-gradient(
+        closest-side,
+        rgba(21, 107, 255, .16),
+        rgba(21, 107, 255, 0)
+    );
+
+}
+
+/* диагональный блик стекла — как у .header::after */
+
+.footer::after {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: -1;
+
+    pointer-events: none;
+
+    background: linear-gradient(
+        112deg,
+        rgba(255, 255, 255, .50) 0%,
+        rgba(255, 255, 255, 0) 38%,
+        rgba(255, 255, 255, 0) 64%,
+        rgba(255, 255, 255, .38) 100%
+    );
+
+}
+
+/* ===========================
+        ВЕРХНЯЯ ЧАСТЬ
+=========================== */
+
+.footer-container {
+
+    width: 1500px;
+
+    max-width: 100%;
+
+    margin: 0 auto;
+
+    padding: 40px 42px 28px;
+
+    display: grid;
+
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr);
+
+    gap: 34px;
+
+    align-items: start;
+
+}
+
+/* --- бренд --- */
+
+.footer-brand {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 12px;
+
+}
+
+.footer-logo {
+
+    display: block;
+
+    position: relative;
+
+    width: 250px;
+
+    height: 52px;
+
+    overflow: hidden;
+
+    flex: 0 0 auto;
+
+}
+
+.footer-logo img {
+
+    position: absolute;
+
+    top: 60%;
+
+    left: 0;
+
+    transform: translateY(-50%);
+
+    width: 280px;
+
+    height: auto;
+
+    display: block;
+
+}
+
+.footer-tagline {
+
+    max-width: 420px;
+
+    margin: 0;
+
+    font-size: 15px;
+
+    line-height: 1.6;
+
+    color: #5C6B85;
+
+}
+
+/* --- колонки со ссылками --- */
+
+.footer-col {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+}
+
+.footer-col__title {
+
+    margin-bottom: 4px;
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    letter-spacing: .08em;
+
+    text-transform: uppercase;
+
+    color: #9AA8BF;
+
+}
+
+.footer-col a,
+.footer-col span.footer-col__text {
+
+    position: relative;
+
+    width: fit-content;
+
+    text-decoration: none;
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    color: #36425A;
+
+    transition: color .25s ease, transform .25s ease;
+
+}
+
+.footer-col a {
+
+    padding: 4px 12px;
+
+    margin: -4px -12px;
+
+    border-radius: 12px;
+
+    isolation: isolate;
+
+}
+
+/* мягкая стеклянная подсветка вместо подчёркивания */
+
+.footer-col a::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: -1;
+
+    pointer-events: none;
+
+    border-radius: inherit;
+
+    opacity: 0;
+
+    transform: scale(.92);
+
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, .85) 0%,
+        rgba(47, 134, 255, .12) 100%
+    );
+
+    border: 1px solid rgba(255, 255, 255, .9);
+
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, .95),
+        0 6px 16px rgba(34, 88, 188, .12);
+
+    transition: opacity .28s ease, transform .28s cubic-bezier(.2, .8, .3, 1);
+
+}
+
+.footer-col a:hover {
+
+    color: #156BFF;
+
+}
+
+.footer-col a:hover::before,
+.footer-col a:focus-visible::before {
+
+    opacity: 1;
+
+    transform: scale(1);
+
+}
+
+.footer-col a:focus-visible {
+
+    outline: none;
+
+    color: #156BFF;
+
+}
+
+.footer-col span.footer-col__text {
+
+    font-weight: 500;
+
+    color: #5C6B85;
+
+}
+
+/* --- соцсети --- */
+
+.footer-socials {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: 4px;
+
+}
+
+.footer-social {
+
+    display: grid;
+
+    place-items: center;
+
+    width: 42px;
+
+    height: 42px;
+
+    border-radius: 50%;
+
+    color: #156BFF;
+
+    background: rgba(255, 255, 255, .70);
+
+    border: 1px solid rgba(255, 255, 255, .9);
+
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, .95),
+        0 6px 16px rgba(34, 88, 188, .10);
+
+    transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
+
+}
+
+.footer-social:hover {
+
+    transform: translateY(-3px);
+
+    background: linear-gradient(180deg, #2F86FF 0%, #156BFF 100%);
+
+    color: #fff;
+
+    box-shadow: 0 12px 26px rgba(21, 107, 255, .35);
+
+}
+
+.footer-social svg {
+
+    width: 20px;
+
+    height: 20px;
+
+}
+
+/* ===========================
+        НИЖНЯЯ ПОЛОСА
+=========================== */
+
+.footer-bottom {
+
+    width: 1500px;
+
+    max-width: 100%;
+
+    margin: 0 auto;
+
+    padding: 16px 42px 26px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 16px;
+
+    flex-wrap: wrap;
+
+    border-top: 1px solid rgba(21, 107, 255, .10);
+
+}
+
+.footer-copy {
+
+    font-size: 14px;
+
+    color: #8A97AE;
+
+}
+
+.footer-bottom__links {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 22px;
+
+    flex-wrap: wrap;
+
+}
+
+.footer-bottom__links a {
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    color: #8A97AE;
+
+    transition: color .25s ease;
+
+}
+
+.footer-bottom__links a:hover {
+
+    color: #156BFF;
+
+}
+
+/* ===========================
+        МЕНЬШЕ ДВИЖЕНИЯ
+=========================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .footer-col a::before {
+
+        transform: none;
+
+        transition: opacity .2s ease;
+
+    }
+
+    .footer-social {
+
+        transition: none;
+
+    }
+
+    .footer-social:hover {
+
+        transform: none;
+
+    }
+
+}
+
+/* ===========================
+        АДАПТИВ
+=========================== */
+
+@media (max-width: 1100px) {
+
+    .footer-container {
+
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+
+        gap: 28px;
+
+        padding: 34px 26px 24px;
+
+    }
+
+    .footer-brand {
+
+        grid-column: 1 / -1;
+
+    }
+
+    .footer-bottom {
+
+        padding: 16px 26px 24px;
+
+    }
+
+}
+
+@media (max-width: 640px) {
+
+    .footer {
+
+        margin-top: 60px;
+
+        border-top-left-radius: 22px;
+
+        border-top-right-radius: 22px;
+
+    }
+
+    .footer-container {
+
+        grid-template-columns: minmax(0, 1fr);
+
+        padding: 28px 20px 20px;
+
+    }
+
+    .footer-logo {
+
+        width: 210px;
+
+        height: 46px;
+
+    }
+
+    .footer-logo img {
+
+        width: 240px;
+
+    }
+
+    .footer-bottom {
+
+        padding: 14px 20px 20px;
+
+        justify-content: center;
+
+        text-align: center;
+
+    }
+
+}

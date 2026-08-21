@@ -115,6 +115,9 @@ body{
 
     position:relative;
 
+    /* выше слоя со звёздами (.header-sky) */
+    z-index:2;
+
 }
 
 /* ===========================
@@ -123,35 +126,44 @@ body{
 
 .logo{
 
-    display:inline-flex;
+    display:block;
 
-    align-items:center;
+    position:relative;
 
-    align-self:center;
+    width:250px;      /* ширина зоны клика */
 
-    width:fit-content;
+    height:56px;      /* высота зоны клика */
 
-    height:fit-content;
+    overflow:hidden;  /* режет прозрачные поля картинки */
 
-    line-height:0;
+    flex:0 0 auto;
 
 }
 
 .logo img{
 
-    height:52px;
+    position:absolute;
 
-    width:auto;
+    top:60%;
+
+    left:50%;
+
+    transform:translate(-50%,-50%);
+
+    width:290px;      /* крупнее коробки — рисунок заполняет её */
+
+    height:auto;
 
     display:block;
-
-    object-fit:contain;
 
 }
 
 /* ===========================
         MENU
 =========================== */
+
+/* меню прижато к логотипу слева,
+   кнопка входа уезжает вправо сама (margin-right:auto) */
 
 .nav{
 
@@ -161,9 +173,9 @@ body{
 
     gap:18px;
 
-    margin-left:auto;
+    margin-left:34px;
 
-    margin-right:40px;
+    margin-right:auto;
 
 }
 
@@ -190,6 +202,8 @@ body{
     padding:0 24px;
 
     border-radius:26px;
+
+    white-space:nowrap;
 
     transition:color .25s ease, background .25s ease, box-shadow .25s ease;
 
@@ -231,6 +245,58 @@ body{
 }
 
 /* ===========================
+   НАПРАВЛЕНИЯ — раздел в работе
+=========================== */
+
+.nav a.nav-soon{
+
+    padding-right:38px;
+
+}
+
+/* пульсирующая точка справа от надписи */
+
+.nav a.nav-soon::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:50%;
+
+    right:22px;
+
+    width:7px;
+
+    height:7px;
+
+    margin-top:-3.5px;
+
+    border-radius:50%;
+
+    background:#2F86FF;
+
+    animation:nav-soon-pulse 2.4s ease-out infinite;
+
+}
+
+@keyframes nav-soon-pulse{
+
+    0%      { box-shadow:0 0 0 0 rgba(47,134,255,.45); }
+
+    70%,100%{ box-shadow:0 0 0 8px rgba(47,134,255,0); }
+
+}
+
+/* отступ переключателя темы от «Направлений» */
+
+.nav .theme-toggle{
+
+    margin-left:6px;
+
+}
+
+/* ===========================
         TOUR BUTTON
 =========================== */
 
@@ -247,6 +313,8 @@ body{
     width:205px;
 
     height:58px;
+
+    flex:0 0 auto;
 
     text-decoration:none;
 
@@ -291,27 +359,28 @@ body{
 }
 
 /* ===========================
-        LOGO
+   УЗКИЕ ЭКРАНЫ
+   меню умеет прокручиваться, а не ломать шапку
 =========================== */
 
-.logo{
-    display:block;
-    position:relative;
+@media (max-width:1540px){
 
-    width:250px;      /* ширина зоны клика */
-    height:56px;      /* высота зоны клика */
+    .nav{
 
-    overflow:hidden;  /* режет прозрачные поля картинки */
-    flex:0 0 auto;
-}
+        margin-left:20px;
 
-.logo img{
-    position:absolute;
-    top:60%;
-    left:50%;
-    transform:translate(-50%,-50%);
+        gap:10px;
 
-    width:290px;      /* крупнее коробки — рисунок заполняет её */
-    height:auto;
-    display:block;
+        min-width:0;
+
+        overflow-x:auto;
+
+        scrollbar-width:none;
+
+    }
+
+    .nav::-webkit-scrollbar{ display:none; }
+
+    .nav a{ padding:0 16px; font-size:18px; }
+
 }

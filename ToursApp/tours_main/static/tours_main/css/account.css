@@ -2279,3 +2279,188 @@ html.lg-on .glass::before {
         background: rgba(255, 255, 255, .92);
     }
 }
+
+/* ==========================================================================
+   ДОПОЛНЕНИЯ (синхронизация кабинета с админкой)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Иконка пункта меню + точка непрочитанных на «звоночке»
+
+   Точка живёт ТОЛЬКО пока у пункта есть класс has-unread. Класс ставит
+   шаблон (по unread_count из базы) и снимает account.js после того,
+   как сервер подтвердил прочтение.
+   -------------------------------------------------------------------------- */
+.acc-nav__ic {
+    position: relative;
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 19px;
+    height: 19px;
+}
+
+.acc-nav__ic svg {
+    width: 19px;
+    height: 19px;
+}
+
+.acc-nav__item.has-unread .acc-nav__ic::after {
+    content: "";
+    position: absolute;
+    top: -2px;
+    right: -3px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--coral);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, .9);
+    animation: pulse 2.4s infinite;
+}
+
+.acc-nav__item.is-active.has-unread .acc-nav__ic::after {
+    box-shadow: 0 0 0 2px rgba(43, 140, 246, .95);
+}
+
+/* бейдж-счётчик прячется целиком, когда непрочитанных нет */
+.acc-nav__count[hidden] {
+    display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   Карточки НАПРАВЛЕНИЙ (Турция, Япония, Китай…) в блоке рекомендаций.
+   Это не туры — данные берутся из модели Destination.
+   -------------------------------------------------------------------------- */
+.dests {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+}
+
+.dest {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition: transform .5s var(--ease-out), box-shadow .4s var(--ease);
+}
+
+.dest__media {
+    position: relative;
+    flex: none;
+    height: 150px;
+    overflow: hidden;
+    background: linear-gradient(140deg, var(--g1, #47a0ff), var(--g2, #7c6cff));
+}
+
+.dest__media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(90% 70% at 20% 10%, rgba(255, 255, 255, .42), transparent 60%),
+        linear-gradient(180deg, transparent 45%, rgba(6, 30, 62, .38));
+}
+
+.dest__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .8s var(--ease-out);
+}
+
+.dest:hover .dest__media img {
+    transform: scale(1.08);
+}
+
+.dest__price {
+    position: absolute;
+    z-index: 3;
+    left: 12px;
+    bottom: 12px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font: 700 14px/1 "Inter", sans-serif;
+    color: var(--navy);
+    background: rgba(255, 255, 255, .85);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.dest__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 15px 18px 18px;
+}
+
+.dest__body h3 {
+    margin: 0 0 6px;
+    font: 700 18px/1.25 "Inter", sans-serif;
+    letter-spacing: -.02em;
+    color: var(--navy);
+}
+
+.dest__body p {
+    margin: 0 0 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-2);
+}
+
+.dest__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.dest__count {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font: 600 12.5px/1 "Inter", sans-serif;
+    color: var(--blue-700);
+    background: rgba(43, 140, 246, .14);
+}
+
+/* --------------------------------------------------------------------------
+   Мелочи: блок удаления аккаунта стал формой, добавилось поле пароля
+   -------------------------------------------------------------------------- */
+.danger .field {
+    max-width: 280px;
+}
+
+.danger .field input {
+    width: 100%;
+    height: 42px;
+    padding: 0 14px;
+    border-radius: var(--r-sm);
+    border: 1px solid rgba(255, 107, 107, .35);
+    background: rgba(255, 255, 255, .75);
+    font: 500 14px/1 "Inter", sans-serif;
+    color: var(--navy);
+    outline: none;
+    transition: border-color .25s var(--ease), box-shadow .25s var(--ease);
+}
+
+.danger .field input:focus {
+    border-color: var(--coral);
+    box-shadow: 0 0 0 4px rgba(255, 107, 107, .14);
+}
+
+/* поле выбора файла в настройках */
+.field input[type="file"] {
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--text-2);
+}
+
+/* пустое состояние с кнопкой внутри */
+.empty .btn {
+    margin-top: 14px;
+}

@@ -554,8 +554,24 @@
                 card.classList.add('is-removing');
                 setTimeout(() => {
                     card.remove();
-                    const counter = $('.acc-nav__item[data-tab="favorites"] .acc-nav__count');
-                    if (counter) counter.textContent = data.total;
+
+                    // счётчик в меню: при нуле бейдж прячем, а не рисуем «0»
+                    const counter = $('[data-fav-badge]');
+                    if (counter) {
+                        counter.textContent = String(data.total);
+                        counter.hidden = data.total === 0;
+                    }
+
+                    // список опустел — показываем заглушку вместо пустоты
+                    const grid = $('.panel[data-panel="favorites"] .favs');
+                    if (grid && !$$('.fav', grid).length) {
+                        grid.innerHTML =
+                            '<div class="glass card empty">' +
+                            '<b>В избранном пусто</b>' +
+                            '<span>Нажимайте на сердечко в каталоге туров, чтобы следить за ценой.</span>' +
+                            '</div>';
+                    }
+
                     toast('«' + title + '» убран из избранного');
                 }, 380);
             })
@@ -565,33 +581,84 @@
             });
     });
 
-    /* ---- уведомления: «прочитать все» ------------------------------------- */
+    /* ---- уведомления ------------------------------------------------------
+       Раньше здесь было две проблемы:
+       1) слушали [data-read-all-form], а в шаблоне стоял data-read-all —
+          обработчик не навешивался и на сервер ничего не уходило;
+       2) клик по одному уведомлению только снимал класс в DOM, в базе
+          is_read оставался False — после F5 «звоночек» снова горел.
+       Теперь оба действия ходят на сервер и обновляют бейдж. */
+
+    const notifTab = $('[data-notif-tab]');
+    const unreadBadge = $('[data-unread-badge]');
+
+    function setUnread(count) {
+        const n = Math.max(0, Number(count) || 0);
+
+        if (unreadBadge) {
+            unreadBadge.textContent = String(n);
+            unreadBadge.hidden = n === 0;      // ноль — бейджа нет вообще
+        }
+
+        // точка на колокольчике снимается вместе со счётчиком
+        if (notifTab) notifTab.classList.toggle('has-unread', n > 0);
+    }
+
+    function unreadInDom() {
+        return $$('.note.is-unread').length;
+    }
+
+    /* «Прочитать все» */
     const readAllForm = $('[data-read-all-form]');
     if (readAllForm) {
         readAllForm.addEventListener('submit', e => {
             e.preventDefault();
+
             const unread = $$('.note.is-unread');
 
             postTo(readAllForm.action)
-                .then(() => {
+                .then(data => {
                     unread.forEach((note, i) =>
                         setTimeout(() => note.classList.remove('is-unread'), i * 80));
-                    const badge = $('.acc-nav__item[data-tab="notifications"] .acc-nav__count');
-                    if (badge) badge.textContent = '0';
+
+                    setUnread(data && typeof data.unread === 'number' ? data.unread : 0);
                     toast(unread.length ? 'Все уведомления прочитаны' : 'Новых уведомлений нет');
                 })
-                .catch(() => readAllForm.submit());   // без JS-ответа — обычная отправка
+                .catch(() => readAllForm.submit());   // нет JSON-ответа — обычная отправка
         });
     }
+
+    /* Клик по одному уведомлению */
+    document.addEventListener('click', e => {
+        const note = e.target.closest('[data-note]');
+        if (!note || !note.classList.contains('is-unread')) return;
+
+        const url = note.dataset.url;
+        note.classList.remove('is-unread');
+
+        if (!url) {
+            setUnread(unreadInDom());
+            return;
+        }
+
+        postTo(url)
+            .then(data => {
+                setUnread(data && typeof data.unread === 'number' ? data.unread : unreadInDom());
+            })
+            .catch(() => {
+                // сервер не ответил — возвращаем как было, чтобы не врать человеку
+                note.classList.add('is-unread');
+                setUnread(unreadInDom());
+                toast('Не получилось отметить прочитанным');
+            });
+    });
+
+    /* при загрузке страницы бейдж всегда соответствует реальному DOM */
+    setUnread(unreadInDom());
 
     /* ---- сообщения от Django (messages) показываем теми же тостами -------- */
     $$('.server-messages [data-message]').forEach((node, i) =>
         setTimeout(() => toast(node.textContent.trim()), 350 + i * 260));
-
-    document.addEventListener('click', e => {
-        const note = e.target.closest('[data-note]');
-        if (note) note.classList.remove('is-unread');
-    });
 
     /* ----------------------------------------------------------------------
        14. Загрузка документов
@@ -669,13 +736,13 @@
     });
 
     /* ----------------------------------------------------------------------
-       16. Сохранение профиля без перезагрузки (если бэкенд ещё не готов)
+       16. Формы настроек
+
+       ЗДЕСЬ БЫЛ БАГ. Раньше этот блок перехватывал submit формы настроек
+       и делал e.preventDefault(), показывая тост «Изменения сохранены».
+       Условие !form.getAttribute('action') срабатывало и на action="",
+       то есть всегда — форма никогда не доходила до сервера, а человек
+       видел сообщение об успехе. Заглушка удалена: формы отправляются
+       по-настоящему, а подтверждение приходит из Django messages.
        ---------------------------------------------------------------------- */
-    const profileForm = $('.panel[data-panel="settings"] form');
-    if (profileForm && !profileForm.getAttribute('action')) {
-        profileForm.addEventListener('submit', e => {
-            e.preventDefault();
-            toast('Изменения сохранены');
-        });
-    }
 })();
