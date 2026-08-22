@@ -1,0 +1,257 @@
+{% extends "tours_main/base.html" %}
+{% load static %}
+
+{% block title %}
+Направления
+{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'tours_main/css/destinations_page.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="dst">
+
+    <!-- полоса прогресса чтения -->
+    <div class="dst-progress" aria-hidden="true"><i></i></div>
+
+
+    <!-- ===========================================
+                    ШАПКА СТРАНИЦЫ
+    =========================================== -->
+
+    <section class="dst-hero">
+
+        <div class="dst-hero__glow" aria-hidden="true"></div>
+
+        <div class="dst-hero__inner">
+
+            <span class="dst-eyebrow">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.9"/>
+                    <path d="M3 12h18M12 3c2.5 2.6 2.5 15 0 18M12 3c-2.5 2.6-2.5 15 0 18"
+                          stroke="currentColor" stroke-width="1.7"/>
+                </svg>
+                Гид по странам
+            </span>
+
+            <h1>
+                Направления
+                <span>со всего мира</span>
+            </h1>
+
+            <p class="dst-hero__lead">
+                Девять стран, которые мы знаем лично: когда лучше ехать,
+                сколько лететь, что смотреть в первую очередь и от какой
+                суммы начинается поездка.
+            </p>
+
+            <div class="dst-hero__stats">
+
+                <div class="dst-stat">
+                    <b>{{ countries_count }}</b>
+                    <span>стран в подборке</span>
+                </div>
+
+                <div class="dst-stat">
+                    <b>от {{ cheapest }} ₽</b>
+                    <span>самое доступное направление</span>
+                </div>
+
+                <div class="dst-stat">
+                    <b>24/7</b>
+                    <span>поддержка в поездке</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ===========================================
+              НАВИГАЦИЯ + СТРАНЫ
+    =========================================== -->
+
+    <div class="dst-layout">
+
+        <!-- ==========  СЛЕВА: СПИСОК СТРАН  ========== -->
+
+        <aside class="dst-side">
+
+            <span class="dst-side__title">Страны</span>
+
+            <nav class="dst-nav" aria-label="Список стран">
+
+                <i class="dst-nav__pill" aria-hidden="true"></i>
+
+                {% for c in countries %}
+                    <a href="#{{ c.slug }}"
+                       class="dst-nav__item"
+                       data-jump="{{ c.slug }}">
+
+                        <i class="dst-flag dst-flag--{{ c.slug }}" aria-hidden="true"></i>
+
+                        <span class="dst-nav__name">{{ c.name }}</span>
+
+                        <span class="dst-nav__price">от {{ c.price }} ₽</span>
+
+                    </a>
+                {% endfor %}
+
+            </nav>
+
+            <a href="{% url 'tours' %}" class="dst-side__cta">
+                Все туры
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor"
+                          stroke-width="2.2" stroke-linecap="round"
+                          stroke-linejoin="round"/>
+                </svg>
+            </a>
+
+        </aside>
+
+
+        <!-- ==========  СПРАВА: САМИ СТРАНЫ  ========== -->
+
+        <main class="dst-main">
+
+            {% for c in countries %}
+
+            <article class="dst-country c-{{ c.slug }}" id="{{ c.slug }}">
+
+                <!-- заголовок с декором в стиле страны -->
+
+                <header class="dst-country__head">
+
+                    <div class="dst-decor"
+                         data-decor="{{ c.decor }}"
+                         aria-hidden="true"></div>
+
+                    <span class="dst-country__index dst-reveal">
+                        {{ c.number }} · направление
+                    </span>
+
+                    <h2 class="dst-reveal">{{ c.name }}</h2>
+
+                    <p class="dst-country__tagline dst-reveal">
+                        {{ c.tagline }}
+                    </p>
+
+                </header>
+
+                <!-- постер + цена -->
+
+                <div class="dst-shot dst-reveal">
+
+                    <div class="dst-shot__frame">
+                        <img src="{% if c.photo %}{{ c.photo }}{% else %}{% static c.art %}{% endif %}"
+                             alt="{{ c.name }}"
+                             loading="lazy">
+                    </div>
+
+                    {% if c.tours_count %}
+                        <span class="dst-shot__badge">
+                            <i></i>
+                            В каталоге: {{ c.tours_count }}
+                        </span>
+                    {% else %}
+                        <span class="dst-shot__badge">
+                            <i></i>
+                            Подберём индивидуально
+                        </span>
+                    {% endif %}
+
+                    <div class="dst-shot__panel">
+
+                        <div class="dst-shot__price">
+                            <span>Туры от</span>
+                            <strong>{{ c.price }} ₽</strong>
+                        </div>
+
+                        <a href="{% url 'tours' %}?c={{ c.name|urlencode }}"
+                           class="dst-shot__btn">
+                            Смотреть туры
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor"
+                                      stroke-width="2.2" stroke-linecap="round"
+                                      stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+
+                    </div>
+
+                </div>
+
+                <!-- текст + короткая справка -->
+
+                <div class="dst-body">
+
+                    <div class="dst-text dst-reveal">
+                        {% for paragraph in c.text %}
+                            <p>{{ paragraph }}</p>
+                        {% endfor %}
+                    </div>
+
+                    <ul class="dst-facts dst-reveal">
+                        {% for fact in c.facts %}
+                            <li>
+                                <span class="dst-fact__label">{{ fact.label }}</span>
+                                <span class="dst-fact__value">{{ fact.value }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                </div>
+
+                <!-- города -->
+
+                <div class="dst-cities">
+                    {% for city in c.cities %}
+                        <div class="dst-city dst-reveal">
+
+                            <span class="dst-city__n">
+                                0{{ forloop.counter }}
+                            </span>
+
+                            <h3>{{ city.name }}</h3>
+
+                            <p>{{ city.text }}</p>
+
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- за что любят -->
+
+                <div class="dst-tags dst-reveal">
+                    {% for tag in c.tags %}
+                        <span class="dst-tag">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+
+            </article>
+
+            {% empty %}
+
+            <p class="dst-country__tagline">
+                Направления пока не заведены.
+            </p>
+
+            {% endfor %}
+
+        </main>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+    <script src="{% static 'tours_main/js/destinations_page.js' %}"></script>
+{% endblock %}

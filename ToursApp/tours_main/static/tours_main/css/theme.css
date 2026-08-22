@@ -224,6 +224,9 @@ html.theme-anim body *:not(.theme-toggle):not(.theme-toggle *){
    4. ВОЛНА ОТ КНОПКИ
 ========================================================== */
 
+/* Кольца намеренно размыты: чёткий круг читается как «граница»,
+   а размытый — как звуковая волна, которая проходит по экрану. */
+
 .theme-wave{
 
     position:fixed;
@@ -235,8 +238,37 @@ html.theme-anim body *:not(.theme-toggle):not(.theme-toggle *){
 
     transform:translate(-50%,-50%);
 
+    filter:blur(var(--wave-blur,6px));
+
     pointer-events:none;
     z-index:9998;
+
+    will-change:width,height,opacity,filter;
+
+}
+
+/* мягкий «вздох» в центре — идёт первым и подсвечивает точку нажатия */
+
+.theme-wave-core{
+
+    position:fixed;
+    width:0;
+    height:0;
+
+    border-radius:50%;
+
+    background:radial-gradient(
+        circle,
+        var(--wave-color,rgba(255,255,255,.5)) 0%,
+        rgba(255,255,255,0) 68%
+    );
+
+    transform:translate(-50%,-50%);
+
+    filter:blur(26px);
+
+    pointer-events:none;
+    z-index:9997;
 
     will-change:width,height,opacity;
 
@@ -636,6 +668,429 @@ html.theme-anim body *:not(.theme-toggle):not(.theme-toggle *){
     [data-theme="dark"] .theme-toggle__star,
     [data-theme="dark"] .sky-star{ animation:none; opacity:1; }
 
-    .theme-wave{ display:none; }
+    .theme-wave,
+    .theme-wave-core{ display:none; }
 
 }
+
+
+/* ==========================================================
+   11. ТЁМНАЯ ТЕМА — ФУТЕР
+   Футер есть на каждой странице, поэтому без него тёмная тема
+   выглядит недоделанной сильнее всего.
+========================================================== */
+
+[data-theme="dark"] .footer{
+
+    color:#C3D3EC;
+
+    background:linear-gradient(
+        180deg,
+        rgba(11,19,38,.72) 0%,
+        rgba(9,16,32,.92) 100%
+    );
+
+    border-top:1px solid rgba(255,255,255,.10);
+
+}
+
+[data-theme="dark"] .footer::before{
+
+    background:radial-gradient(
+        closest-side,
+        rgba(80,140,255,.16),
+        rgba(80,140,255,0)
+    );
+
+}
+
+[data-theme="dark"] .footer::after{
+
+    background:linear-gradient(
+        112deg,
+        rgba(255,255,255,.08) 0%,
+        rgba(255,255,255,0)   38%,
+        rgba(255,255,255,0)   64%,
+        rgba(255,255,255,.06) 100%
+    );
+
+}
+
+[data-theme="dark"] .footer-tagline{ color:#93A6C4; }
+[data-theme="dark"] .footer-col__title{ color:#6E82A3; }
+
+[data-theme="dark"] .footer-col a,
+[data-theme="dark"] .footer-col span.footer-col__text{ color:#C3D3EC; }
+
+[data-theme="dark"] .footer-col a:hover{ color:#7FB3FF; }
+
+[data-theme="dark"] .footer-col a::before{
+
+    background:linear-gradient(
+        180deg,
+        rgba(255,255,255,.12) 0%,
+        rgba(90,150,255,.10) 100%
+    );
+
+    border:1px solid rgba(255,255,255,.14);
+
+    box-shadow:
+        inset 0 1px 1px rgba(255,255,255,.16),
+        0 6px 16px rgba(0,0,0,.35);
+
+}
+
+[data-theme="dark"] .footer-social{
+
+    color:#7FB3FF;
+    background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.14);
+
+    box-shadow:
+        inset 0 1px 1px rgba(255,255,255,.12),
+        0 6px 16px rgba(0,0,0,.35);
+
+}
+
+[data-theme="dark"] .footer-social:hover{
+    color:#fff;
+    background:linear-gradient(180deg,#3A7BF0 0%,#1F5AD8 100%);
+    box-shadow:0 12px 26px rgba(0,0,0,.5);
+}
+
+[data-theme="dark"] .footer-bottom{
+    border-top:1px solid rgba(255,255,255,.08);
+}
+
+[data-theme="dark"] .footer-copy,
+[data-theme="dark"] .footer-bottom__links a{ color:#6E82A3; }
+
+[data-theme="dark"] .footer-bottom__links a:hover{ color:#7FB3FF; }
+
+
+/* ==========================================================
+   12. ТЁМНАЯ ТЕМА — СТРАНИЦА «НАПРАВЛЕНИЯ»
+   Страница построена на своих токенах, поэтому достаточно
+   переопределить их — правила ниже почти не трогают вёрстку.
+========================================================== */
+
+[data-theme="dark"] .dst{
+
+    --dst-ink:        #E6EEFB;
+    --dst-ink-2:      #B7C8E2;
+    --dst-muted:      #8FA3C0;
+
+    --dst-bg:         #070D1A;
+    --dst-surface:    rgba(19,29,52,.72);
+    --dst-surface-2:  rgba(19,29,52,.52);
+    --dst-line:       rgba(255,255,255,.10);
+
+    --dst-blue:       #6FA8FF;
+    --dst-blue-soft:  rgba(90,150,255,.16);
+
+    --dst-shadow:     0 26px 60px -30px rgba(0,0,0,.75);
+    --dst-shadow-lg:  0 48px 110px -44px rgba(0,0,0,.85);
+
+}
+
+[data-theme="dark"] .dst-hero__glow{
+
+    background:
+        radial-gradient(circle at 30% 40%, rgba(47,134,255,.26), transparent 62%),
+        radial-gradient(circle at 72% 34%, rgba(124,108,255,.24), transparent 60%),
+        radial-gradient(circle at 52% 76%, rgba(53,214,232,.16), transparent 64%);
+
+}
+
+[data-theme="dark"] .dst-nav__pill{
+
+    background:linear-gradient(
+        180deg,
+        rgba(255,255,255,.12) 0%,
+        rgba(90,150,255,.10) 100%
+    );
+
+    box-shadow:
+        inset 0 1px 1px rgba(255,255,255,.16),
+        0 10px 24px -12px rgba(0,0,0,.7);
+
+}
+
+[data-theme="dark"] .dst-side::-webkit-scrollbar-thumb{
+    background:rgba(255,255,255,.16);
+}
+
+[data-theme="dark"] .dst-shot__btn{
+    color:#0E2141;
+    background:linear-gradient(180deg,#EAF2FF,#C9DCFF);
+}
+
+[data-theme="dark"] .dst-flag{
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.16),
+        0 2px 5px rgba(0,0,0,.45);
+}
+
+/* постеры ночью чуть приглушаем, иначе они «кричат» на тёмном фоне */
+
+[data-theme="dark"] .dst-shot img{
+    filter:brightness(.86) saturate(.95);
+}
+
+
+/* ==========================================================
+   13. ТЁМНАЯ ТЕМА — КАБИНЕТ И ВХОД
+
+   Важно: на этих двух страницах мало переопределить токены.
+   Карточки, поля и «стекло» там залиты жёстко заданным белым
+   (rgba(255,255,255,…)), поэтому от смены только цвета текста
+   получался белый текст на белой карточке — окно выглядело
+   сломанным. Ниже перекрашены сами поверхности.
+========================================================== */
+
+/* ---------- 13.1 Кабинет: токены ---------- */
+
+[data-theme="dark"] .acc,
+[data-theme="dark"] .acc-bg{
+
+    --text:   #E6EEFB;
+    --text-2: #9FB3D0;
+    --text-3: #6E82A3;
+
+    --navy:   #E6EEFB;
+    --navy-2: #C3D3EC;
+
+    --bg:     #070D1A;
+    --line:   rgba(255,255,255,.10);
+
+    --glass-tint: linear-gradient(135deg,
+                   rgba(28,42,74,.82), rgba(15,25,45,.55));
+    --glass-line: rgba(255,255,255,.13);
+
+    --shadow-sm: 0 6px 18px -8px rgba(0,0,0,.60);
+    --shadow-md: 0 22px 50px -24px rgba(0,0,0,.70);
+    --shadow-lg: 0 40px 90px -36px rgba(0,0,0,.80);
+
+}
+
+[data-theme="dark"] body:has(.acc){ background:#070D1A; }
+
+/* ---------- 13.2 Кабинет: стеклянные карточки ---------- */
+
+[data-theme="dark"] .glass{
+
+    box-shadow:
+        var(--shadow-md),
+        inset 0 1px 0 rgba(255,255,255,.13),
+        inset 0 -1px 0 rgba(255,255,255,.04);
+
+}
+
+[data-theme="dark"] .glass--edge{
+
+    background-image:
+        linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.035)),
+        linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,0) 32%);
+
+}
+
+[data-theme="dark"] .glass::after{
+
+    background:
+        radial-gradient(320px circle at var(--mx,50%) var(--my,0%),
+            rgba(255,255,255,.16),
+            rgba(255,255,255,.05) 42%,
+            transparent 68%);
+
+}
+
+[data-theme="dark"] .acc-bg__blob{ opacity:.34; }
+[data-theme="dark"] .acc-bg__grain{ opacity:.05; }
+
+/* ---------- 13.3 Кабинет: кнопки, чипсы, поля ---------- */
+
+[data-theme="dark"] .btn--ghost{
+    color:#DCE7F8;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.14);
+}
+
+[data-theme="dark"] .btn--ghost:hover{
+    background:rgba(255,255,255,.15);
+    color:#8FC0FF;
+}
+
+[data-theme="dark"] .btn--soft{
+    color:#9CC4FF;
+    background:rgba(90,150,255,.16);
+}
+
+[data-theme="dark"] .btn--soft:hover{
+    background:rgba(90,150,255,.26);
+}
+
+[data-theme="dark"] .chip{
+    color:#B7C8E2;
+    background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.13);
+}
+
+[data-theme="dark"] .field input,
+[data-theme="dark"] .field select,
+[data-theme="dark"] .field textarea,
+[data-theme="dark"] .danger__act input{
+    color:#E6EEFB;
+    background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.14);
+}
+
+[data-theme="dark"] .field input:focus,
+[data-theme="dark"] .field select:focus,
+[data-theme="dark"] .field textarea:focus{
+    background:rgba(255,255,255,.12);
+    border-color:rgba(90,150,255,.65);
+    box-shadow:0 0 0 4px rgba(43,140,246,.20);
+}
+
+[data-theme="dark"] .danger__act input:focus{
+    background:rgba(255,255,255,.12);
+}
+
+/* выпадающие списки рисует система — без этого пункты белые */
+[data-theme="dark"] .field select option{
+    background:#101A2E;
+    color:#E6EEFB;
+}
+
+[data-theme="dark"] .progress{ background:rgba(255,255,255,.12); }
+
+[data-theme="dark"] .timeline__item::before{ background:#101A2E; }
+
+
+/* ---------- 13.4 Вход и регистрация: токены ---------- */
+
+[data-theme="dark"]{
+
+    --kr-ink:     #E6EEFB;
+    --kr-ink-2:   #DCE7F8;
+    --kr-ink-3:   #C3D3EC;
+
+    --kr-muted:   #8FA3C0;
+    --kr-muted-2: #6E82A3;
+
+    --kr-line:    rgba(255,255,255,.12);
+    --kr-bg:      #070D1A;
+
+    --kr-blue-100:rgba(90,150,255,.16);
+    --kr-blue-50: rgba(90,150,255,.08);
+
+}
+
+/* ---------- 13.5 Вход и регистрация: поверхности ---------- */
+
+[data-theme="dark"] .auth-shell{
+
+    background:linear-gradient(
+        145deg,
+        rgba(26,40,70,.80) 0%,
+        rgba(18,29,52,.60) 45%,
+        rgba(13,21,40,.46) 100%
+    );
+
+    border:1px solid rgba(255,255,255,.12);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.14),
+        inset 0 -1px 0 rgba(255,255,255,.05),
+        0 34px 90px rgba(0,0,0,.60);
+
+}
+
+[data-theme="dark"] .auth-aside{
+
+    background:linear-gradient(
+        160deg,
+        rgba(24,40,76,.85) 0%,
+        rgba(19,31,60,.70) 55%,
+        rgba(15,25,48,.60) 100%
+    );
+
+    border-right:1px solid rgba(255,255,255,.10);
+
+}
+
+[data-theme="dark"] .auth-panel{ background:rgba(13,21,40,.55); }
+
+[data-theme="dark"] .auth-aside__eyebrow{
+    color:#8FC0FF;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.14);
+    box-shadow:0 8px 22px rgba(0,0,0,.35);
+}
+
+[data-theme="dark"] .auth-facts__item{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.12);
+    box-shadow:0 10px 26px rgba(0,0,0,.35);
+}
+
+[data-theme="dark"] .auth-switcher{
+    background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.12);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.10);
+}
+
+[data-theme="dark"] .auth-field__input{
+    color:#E6EEFB;
+    background:rgba(255,255,255,.07);
+    border:1.5px solid rgba(255,255,255,.14);
+}
+
+[data-theme="dark"] .auth-field__input:hover{
+    border-color:rgba(90,150,255,.55);
+}
+
+[data-theme="dark"] .auth-field__input:focus{
+    background:rgba(255,255,255,.12);
+    border-color:#4E9BFF;
+    box-shadow:
+        0 0 0 5px rgba(47,134,255,.18),
+        0 12px 30px rgba(0,0,0,.45);
+}
+
+[data-theme="dark"] .auth-check__mark{
+    background:rgba(255,255,255,.08);
+    border:1.5px solid rgba(255,255,255,.20);
+}
+
+[data-theme="dark"] .auth-meter__track{ background:rgba(255,255,255,.12); }
+
+[data-theme="dark"] .auth-flash__item{
+    color:#9CC4FF;
+    background:rgba(90,150,255,.14);
+    border-color:rgba(90,150,255,.28);
+}
+
+[data-theme="dark"] .auth-flash__item--success{
+    color:#5FD9AC;
+    background:rgba(18,160,106,.16);
+    border-color:rgba(18,160,106,.30);
+}
+
+[data-theme="dark"] .auth-alert,
+[data-theme="dark"] .auth-flash__item--error{
+    color:#FF9AAB;
+    background:rgba(226,68,92,.16);
+    border-color:rgba(226,68,92,.34);
+}
+
+/* световые пятна фона ночью светят слишком сильно */
+
+[data-theme="dark"] .auth-sky__blob{ opacity:.22; }
+
+/* карта маршрута нарисована svg — красим заливкой, а не фоном */
+
+[data-theme="dark"] .auth-route__label{ fill:#C3D3EC; }
+[data-theme="dark"] .auth-route__line{ stroke:#5FA0FF; }
+[data-theme="dark"] .auth-route__dot,
+[data-theme="dark"] .auth-route__plane{ fill:#6FA8FF; }
